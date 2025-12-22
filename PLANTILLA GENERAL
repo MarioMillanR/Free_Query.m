@@ -52,9 +52,105 @@ in
 // CONSULTA NODO Importante esta consulta ya no deberia estar en uso
 
 let
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\BASE FREELANCE.xlsx"), null, true),
+    NODO_Sheet = Origen{[Item="NODO",Kind="Sheet"]}[Data],
+    #"Encabezados promovidos" = Table.PromoteHeaders(NODO_Sheet, [PromoteAllScalars=true]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"ESTADO ", type text}, {"Nit", type any}, {"Razón Social", type text}, {"Ciudad de Domicilio", type text}, {"Direccion", type text}, {"Telefono Fijo", type any}, {"Celular ", Int64.Type}, {"Contacto", type text}, {"Cedula", Int64.Type}, {"Celular Contacto", Int64.Type}, {"Correo Electronico", type text}, {"Fecha de Ingreso", type date}, {"Tipo de Contrato", type text}, {"Oficina", type text}, {"Nombre Jefe Directo", type text}, {"Cargo Jefe Directo", type text}, {"Gerencia", type text}, {"Terminación", type date}, {"OPERATIVO CONTRATADO POR EL NODO", type text}, {"CUENTA PARA OFICINA PPAL DE LA CIUDAD", type text}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado","BOGOTÁ","BOGOTA",Replacer.ReplaceText,{"Oficina"}),
+    #"Personalizada agregada" = Table.AddColumn(#"Valor reemplazado", "NODO PUENTE", each [Oficina]&"_"&"NODO"&" "&[Razón Social]),
+    #"Personalizada agregada1" = Table.AddColumn(#"Personalizada agregada", "OFICINA PUENTE", each if [CUENTA PARA OFICINA PPAL DE LA CIUDAD] = "SI" then [Oficina] else [NODO PUENTE]),
+    #"Filas filtradas" = Table.SelectRows(#"Personalizada agregada1", each ([#"ESTADO "] <> "RETIRO")),
+    Personalizado1 = #"Filas filtradas",
+    #"FILTRO SACO A BANFINANCO" = Table.SelectRows(Personalizado1, each ([Razón Social] <> "BANFINANCO S.A.S."))
+    in
+    #"FILTRO SACO A BANFINANCO"
+    
+// CONSULTA Activos planta
+let
     Origen = Planta,
     #"Filas filtradas" = Table.SelectRows(Origen, each ([Estado] = "Activo"))
 in
     #"Filas filtradas"
+    
 
-//
+// CONSULTA  Activos free
+
+let
+    Origen = Free,
+    #"Filas filtradas" = Table.SelectRows(Origen, each ([Estado] <> "Retiro"))
+in
+    #"Filas filtradas"
+
+// CONSULTA Asesores  Activos En Amabas Bases
+let
+    Origen = Table.NestedJoin(#"Activos Planta", {"Numero"}, #"Activos Free", {"Numero"}, "Activos Free", JoinKind.Inner)
+in
+    Origen
+
+// CONSULTA Puente_EXCLUIR_Asesores__Activos_En_Amabas_Bases
+
+let
+    Origen = Excel.CurrentWorkbook(){[Name="Asesores__Activos_En_Amabas_Bases"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", type any}, {"Area", type text}, {"Subarea", type text}, {"Cargo", type text}, {"Genero ", type text}, {"Fecha de Ingreso", type datetime}, {"Antigüedad en la CompañIa", type text}, {"Tipo de Contrato", type text}, {"Dashboard", type text}, {"Periodo de Prueba ", type text}, {"Fecha de Inicio", type datetime}, {"Fecha de Finalizacion", type datetime}, {"Dias PP", type text}, {"Fecha Inicio Etapa Productiva", type any}, {"Oficina", type text}, {"Nombre Jefe Directo", type text}, {"Cargo Jefe Directo", type text}, {"Fecha de Retiro", type any}, {"Modalidad del Retiro", type any}, {"Motivo del Retiro", type any}, {"Fecha de Nacimiento", type datetime}, {"Edad", type text}, {"Grupo Sanguineo", type text}, {"Lugar de Expedición", type text}, {"Fecha de Expedición", type datetime}, {"Lugar de Nacimiento", type text}, {"Ciudad de Residencia", type text}, {"Dirección", type text}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", type text}, {"Correo Electronico Corporativo", type any}, {"Fecha de Ultimo Aumento", type datetime}, {"Salario Anterior en Basico ", Int64.Type}, {"Regimen", type text}, {"Salario Basico", Int64.Type}, {"Auxilio de Transporte", Int64.Type}, {"Auxilio de Vivienda", Int64.Type}, {"Auxilio de Movilizacion", Int64.Type}, {"Auxilio de Comunicacion", Int64.Type}, {"Bonos", Int64.Type}, {"Total Devengado", Int64.Type}, {"EPS", type text}, {"Afiliacion", type text}, {"AFP", type text}, {"Afiliacion2", type text}, {"CCF", type text}, {"Afiliacion3", type text}, {"CES", type text}, {"Numero de Cuenta", Int64.Type}, {"Tipo de Cuenta", type text}, {"Banco", type text}, {"Empresa", type text}, {"Escolaridad", type text}, {"Titulo Escolaridad", type text}, {"Caso de Emergencia", type text}, {"Telefono Contacto", type any}, {"Estado Civil", type text}, {"Nombre del Conyuge", type text}, {"Tipo de Documento", type text}, {"Numero4", Int64.Type}, {"Fecha de Nacimiento5", type datetime}, {"Hijo 1", type text}, {"Tipo de Documento6", type text}, {"Numero7", Int64.Type}, {"Fecha de Nacimiento8", type datetime}, {"Hijo 2", type text}, {"Tipo de Documento9", type text}, {"Numero10", Int64.Type}, {"Fecha de Nacimiento11", type datetime}, {"Hijo 3", type text}, {"Tipo de Documento12", type text}, {"Numero13", type any}, {"Fecha de Nacimiento14", type any}, {"Hijo 4", type any}, {"Tipo de Documento15", type any}, {"Numero16", type any}, {"Fecha de Nacimiento17", type any}, {"Hijo 5", type any}, {"Tipo de Documento18", type any}, {"Numero19", type any}, {"Fecha de Nacimiento20", type any}, {"Fecha Actualizado", type datetime}, {"Fuero", type any}, {"Fecha Inicio Licencia", type any}, {"Fecha Final Licencia", type any}, {"Lactancia", type any}, {"Codigo CC", Int64.Type}, {"Descripcion CC", type text}, {"Estado", type text}})
+in
+    #"Tipo cambiado"
+// FREE LANCE NODO (No necesita modif)
+let
+    Origen = #"Free",
+    #"Filas filtradas" = Table.SelectRows(Origen, each ([NODO] = "SI")),
+    Personalizado1 = #"Filas filtradas",
+    #"Filas filtradas1" = Table.SelectRows(Personalizado1, each ([Estado] <> "Retiro")),
+    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas1", {"Numero"}, NODO, {"Cedula"}, "NODO.1", JoinKind.LeftOuter),
+    #"Se expandió NODO.1" = Table.ExpandTableColumn(#"Consultas combinadas", "NODO.1", {"NODO PUENTE", "OFICINA PUENTE"}, {"NODO.1.NODO PUENTE", "NODO.1.OFICINA PUENTE"}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Se expandió NODO.1",{"#", "Tipo", "Numero", "Nombre Completo", "Primer Apellido", "Segundo Apellido", "Primer Nombre", "Segundo Nombre", "Entrega Carne", "Area", "Subarea", "Cargo", "Genero ", "Fecha de Ingreso", "Antigüedad en la CompañIa", "Tipo de Contrato", "Dashboard", "Periodo de Prueba ", "Fecha de Inicio", "Fecha de Finalizacion", "DIas PP", "Fecha Inicio Etapa Productiva", "NODO", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Lugar de Expedición", "Fecha de Expedición", "Lugar de Nacimiento", "Ciudad de Residencia", "Dirección", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Personal 2", "EPS", "Afiliacion", "AFP", "Afiliacion2", "CCF", "Afiliacion3", "CES", "Numero de Cuenta", "Tipo de Cuenta", "Banco", "Empresa", "Escolaridad", "Titulo Escolaridad", "Caso de Emergencia", "Telefono Contacto", "Estado Civil", "Nombre del Conyuge", "Tipo de Documento", "Numero4", "Fecha de Nacimiento5", "Hijo 1", "Tipo de Documento6", "Numero7", "Fecha de Nacimiento8", "Hijo 2", "Tipo de Documento9", "Numero10", "Fecha de Nacimiento11", "Hijo 3", "Tipo de Documento12", "Numero13", "Fecha de Nacimiento14", "Hijo 4", "Tipo de Documento15", "Numero16", "Fecha de Nacimiento17", "Hijo 5", "Tipo de Documento18", "Numero19", "Fecha de Nacimiento20", "Fecha Actualizado", "Fuero", "Fecha Inicio Licencia", "Fecha Final Licencia", "Lactancia", "Codigo CC", "Descripcion CC", "Estado", "Contrato Vantage", "Fecha Contrato Vantage", "Retiro Contrato Vantage", "Contrato Colfinactiva", "Fecha Contrato Colfinactiva", "Retiro Contrato Colfinactiva", "Contrato Onest", "Fecha Contrato Onest ", "Retiro Contrato Onest", "VALIDADOR", "A","ANALISIS ESPECIAL REPETIDOS", "CARGO_OFICINA", "NODO.1.NODO PUENTE", "NODO.1.OFICINA PUENTE"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Otras columnas quitadas",{{"NODO.1.OFICINA PUENTE", "Oficina"}}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas con nombre cambiado",{"#", "Tipo", "Numero", "Nombre Completo", "Primer Apellido", "Segundo Apellido", "Primer Nombre", "Segundo Nombre", "Entrega Carne", "Area", "Subarea", "Cargo", "Genero ", "Fecha de Ingreso", "Antigüedad en la CompañIa", "Tipo de Contrato", "Dashboard", "Periodo de Prueba ", "Fecha de Inicio", "Fecha de Finalizacion", "DIas PP", "Fecha Inicio Etapa Productiva", "Oficina", "NODO", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Lugar de Expedición", "Fecha de Expedición", "Lugar de Nacimiento", "Ciudad de Residencia", "Dirección", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Personal 2", "EPS", "Afiliacion", "AFP", "Afiliacion2", "CCF", "Afiliacion3", "CES", "Numero de Cuenta", "Tipo de Cuenta", "Banco", "Empresa", "Escolaridad", "Titulo Escolaridad", "Caso de Emergencia", "Telefono Contacto", "Estado Civil", "Nombre del Conyuge", "Tipo de Documento", "Numero4", "Fecha de Nacimiento5", "Hijo 1", "Tipo de Documento6", "Numero7", "Fecha de Nacimiento8", "Hijo 2", "Tipo de Documento9", "Numero10", "Fecha de Nacimiento11", "Hijo 3", "Tipo de Documento12", "Numero13", "Fecha de Nacimiento14", "Hijo 4", "Tipo de Documento15", "Numero16", "Fecha de Nacimiento17", "Hijo 5", "Tipo de Documento18", "Numero19", "Fecha de Nacimiento20", "Fecha Actualizado", "Fuero", "Fecha Inicio Licencia", "Fecha Final Licencia", "Lactancia", "Codigo CC", "Descripcion CC", "Estado", "Contrato Vantage", "Fecha Contrato Vantage", "Retiro Contrato Vantage", "Contrato Colfinactiva", "Fecha Contrato Colfinactiva", "Retiro Contrato Colfinactiva", "Contrato Onest", "Fecha Contrato Onest ", "Retiro Contrato Onest", "VALIDADOR", "A", "ANALISIS ESPECIAL REPETIDOS", "CARGO_OFICINA", "NODO.1.NODO PUENTE"}),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas reordenadas",{{"NODO.1.NODO PUENTE", "NODO PUENTE"}})
+in
+    #"Columnas con nombre cambiado1"
+
+//  CONSULTA ASESORES NODOS (No necesita modif)
+let
+    Origen = Free,
+    #"Filas filtradas" = Table.SelectRows(Origen, each ([Cargo] = "ASESOR NODO")),
+    Personalizado1 = #"Filas filtradas",
+    #"Filas filtradas2" = Table.SelectRows(Personalizado1, each ([Estado] <> "Retiro")),
+    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas2", {"Nombre Jefe Directo"}, NODO, {"Contacto"}, "NODO.1", JoinKind.LeftOuter),
+    #"Se expandió NODO.1" = Table.ExpandTableColumn(#"Consultas combinadas", "NODO.1", {"NODO PUENTE", "OFICINA PUENTE"}, {"NODO.1.NODO PUENTE", "NODO.1.OFICINA PUENTE"}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Se expandió NODO.1",{"#", "Tipo", "Numero", "Nombre Completo", "Primer Apellido", "Segundo Apellido", "Primer Nombre", "Segundo Nombre", "Entrega Carne", "Area", "Subarea", "Cargo", "Genero ", "Fecha de Ingreso", "Antigüedad en la CompañIa", "Tipo de Contrato", "Dashboard", "Periodo de Prueba ", "Fecha de Inicio", "Fecha de Finalizacion", "DIas PP", "Fecha Inicio Etapa Productiva", "NODO", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Lugar de Expedición", "Fecha de Expedición", "Lugar de Nacimiento", "Ciudad de Residencia", "Dirección", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Personal 2", "EPS", "Afiliacion", "AFP", "Afiliacion2", "CCF", "Afiliacion3", "CES", "Numero de Cuenta", "Tipo de Cuenta", "Banco", "Empresa", "Escolaridad", "Titulo Escolaridad", "Caso de Emergencia", "Telefono Contacto", "Estado Civil", "Nombre del Conyuge", "Tipo de Documento", "Numero4", "Fecha de Nacimiento5", "Hijo 1", "Tipo de Documento6", "Numero7", "Fecha de Nacimiento8", "Hijo 2", "Tipo de Documento9", "Numero10", "Fecha de Nacimiento11", "Hijo 3", "Tipo de Documento12", "Numero13", "Fecha de Nacimiento14", "Hijo 4", "Tipo de Documento15", "Numero16", "Fecha de Nacimiento17", "Hijo 5", "Tipo de Documento18", "Numero19", "Fecha de Nacimiento20", "Fecha Actualizado", "Fuero", "Fecha Inicio Licencia", "Fecha Final Licencia", "Lactancia", "Codigo CC", "Descripcion CC", "Estado", "Contrato Vantage", "Fecha Contrato Vantage", "Retiro Contrato Vantage", "Contrato Colfinactiva", "Fecha Contrato Colfinactiva", "Retiro Contrato Colfinactiva", "Contrato Onest", "Fecha Contrato Onest ", "Retiro Contrato Onest","VALIDADOR", "A","ANALISIS ESPECIAL REPETIDOS", "CARGO_OFICINA", "NODO.1.NODO PUENTE", "NODO.1.OFICINA PUENTE"}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Otras columnas quitadas",{"#", "Tipo", "Numero", "Nombre Completo", "Primer Apellido", "Segundo Apellido", "Primer Nombre", "Segundo Nombre", "Entrega Carne", "Area", "Subarea", "Cargo", "Genero ", "Fecha de Ingreso", "Antigüedad en la CompañIa", "Tipo de Contrato", "Dashboard", "Periodo de Prueba ", "Fecha de Inicio", "Fecha de Finalizacion", "DIas PP", "Fecha Inicio Etapa Productiva", "NODO.1.OFICINA PUENTE", "NODO", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Lugar de Expedición", "Fecha de Expedición", "Lugar de Nacimiento", "Ciudad de Residencia", "Dirección", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Personal 2", "EPS", "Afiliacion", "AFP", "Afiliacion2", "CCF", "Afiliacion3", "CES", "Numero de Cuenta", "Tipo de Cuenta", "Banco", "Empresa", "Escolaridad", "Titulo Escolaridad", "Caso de Emergencia", "Telefono Contacto", "Estado Civil", "Nombre del Conyuge", "Tipo de Documento", "Numero4", "Fecha de Nacimiento5", "Hijo 1", "Tipo de Documento6", "Numero7", "Fecha de Nacimiento8", "Hijo 2", "Tipo de Documento9", "Numero10", "Fecha de Nacimiento11", "Hijo 3", "Tipo de Documento12", "Numero13", "Fecha de Nacimiento14", "Hijo 4", "Tipo de Documento15", "Numero16", "Fecha de Nacimiento17", "Hijo 5", "Tipo de Documento18", "Numero19", "Fecha de Nacimiento20", "Fecha Actualizado", "Fuero", "Fecha Inicio Licencia", "Fecha Final Licencia", "Lactancia", "Codigo CC", "Descripcion CC", "Estado", "Contrato Vantage", "Fecha Contrato Vantage", "Retiro Contrato Vantage", "Contrato Colfinactiva", "Fecha Contrato Colfinactiva", "Retiro Contrato Colfinactiva", "Contrato Onest", "Fecha Contrato Onest ", "Retiro Contrato Onest", "VALIDADOR", "A", "ANALISIS ESPECIAL REPETIDOS", "CARGO_OFICINA", "NODO.1.NODO PUENTE"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas reordenadas",{{"NODO.1.OFICINA PUENTE", "Oficina"}, {"NODO.1.NODO PUENTE", "NODO PUENTE"}}),
+    #"Filas filtradas1" = Table.SelectRows(#"Columnas con nombre cambiado", each ([NODO] = null))
+in
+    #"Filas filtradas1"
+
+// CONSULTA CONTAR NODOS
+let
+    Origen = Free,
+    #"Filas filtradas" = Table.SelectRows(Origen, each ([NODO] = "SI")),
+    Personalizado1 = #"Filas filtradas",
+    #"Filas filtradas1" = Table.SelectRows(Personalizado1, each ([Estado] <> "Retiro")),
+    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas1", {"Numero"}, NODO, {"Cedula"}, "NODO.1", JoinKind.LeftOuter),
+    #"Se expandió NODO.1" = Table.ExpandTableColumn(#"Consultas combinadas", "NODO.1", {"Razón Social", "Oficina", "OPERATIVO CONTRATADO POR EL NODO", "CUENTA PARA OFICINA PPAL DE LA CIUDAD"}, {"NODO.1.Razón Social", "NODO.1.Oficina", "NODO.1.OPERATIVO CONTRATADO POR EL NODO", "NODO.1.CUENTA PARA OFICINA PPAL DE LA CIUDAD"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Se expandió NODO.1","BOGOTÁ","BOGOTA",Replacer.ReplaceText,{"NODO.1.Oficina"}),
+    #"Filas agrupadas" = Table.Group(#"Valor reemplazado", {"NODO.1.Oficina"}, {{"Recuento", each Table.RowCount(_), Int64.Type}}),
+    #"Filas filtradas2" = Table.SelectRows(#"Filas agrupadas", each ([NODO.1.Oficina] <> null))
+in
+    #"Filas filtradas2"
+
+// CONSULTA Anexar1 NODOS
+let
+    Origen = Table.Combine({#"FREE LANCE NODO (No necesita modif)", #"ASESORES NODOS (No necesita modif)"})
+in
+    Origen
+// CONSULTA Anexar1_NODOS (Puente para Cruce)
+let
+    Origen = Excel.CurrentWorkbook(){[Name="Anexar1_NODOS"]}[Content]
+in
+
+// CONSULTA Merge1
+let
+    Origen = Table.NestedJoin(Planta,{"Numero"},Free,{"Numero"},"Free",JoinKind.Inner)
+in
+    Origen
+    Origen
