@@ -1,1 +1,252 @@
+//BASE_FUERZA_COMERCIAL
+let
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2026\01_Enero 2026\Plantilla Nueva Fuerza  Comercial Enero 2026.xlsx"), null, true),
+    Base_Fuerza_Comercial_Table = Origen{[Item="Base_Fuerza_Comercial",Kind="Table"]}[Data],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Base_Fuerza_Comercial_Table,{{"Numero", Int64.Type}, {"ESPECIAL", Int64.Type}, {"Nombre Completo", type text}, {"Cargo", type text}, {"Genero", type text}, {"Fecha de Ingreso", type date}, {"OFICINA HOMOLOGADA", type text}, {"REGIONAL", type text}, {"Oficina", type text}, {"Nombre Jefe Directo", type text}, {"Cargo Jefe Directo", type text}, {"Fecha de Nacimiento", type date}, {"Edad", type text}, {"Grupo Sanguineo", type text}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", type text}, {"Correo Electronico Corporativo", Int64.Type}, {"EPS", type text}, {"Afiliacion", type text}, {"AFP", type text}, {"Estado", type text}, {"Estado Colpatria", type text}, {"Estado Av Villas", type text}, {"Estado Bayport", type text}, {"Estado CSC", type text}, {"Nombre Completo - Copia", type text}, {"Tipo", type any}, {"No Productos", Int64.Type}, {"Productos", type text}, {"VALIDADOR", type text}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Tipo cambiado",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "Estado Colpatria", "Estado Bayport"}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Otras columnas quitadas",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "Estado Colpatria", "Estado Bayport"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Columnas reordenadas",null,"NO TIENE PERMISO PARA RADICAR",Replacer.ReplaceValue,{"Estado Bayport"}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Valor reemplazado1", {"Numero"}, #"Av Villas", {"CC"}, "Tabla56", JoinKind.LeftOuter),
+    #"Se expandió Tabla56" = Table.ExpandTableColumn(#"Consultas combinadas", "Tabla56", {"ESTADO"}, {"Tabla56.ESTADO"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Se expandió Tabla56","AUTORIZADO - ACTIVO","SI",Replacer.ReplaceText,{"Tabla56.ESTADO"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3",null,"NO",Replacer.ReplaceValue,{"Tabla56.ESTADO"}),
+    #"Columnas reordenadas1" = Table.ReorderColumns(#"Valor reemplazado4",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "Tabla56.ESTADO", "Estado Colpatria", "Estado Bayport"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas reordenadas1",{{"Tabla56.ESTADO", "RADICACION AV VILLAS_2"}}),
+    #"Personalizada agregada6" = Table.AddColumn(#"Columnas con nombre cambiado", "RADICACION AV VILLAS", each if [RADICACION AV VILLAS_2] = "SI" and [Cargo] = "DIRECTOR DE OFICINA" then "SI" 
+
+else 
+
+if [RADICACION AV VILLAS_2] = "SI" then "SI"
+
+else 
+
+"NO"),
+    #"Columnas quitadas4" = Table.RemoveColumns(#"Personalizada agregada6",{"RADICACION AV VILLAS_2"}),
+    #"Consulta anexada" = Table.Combine({#"Columnas quitadas4", Operativos, Adicionales}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Consulta anexada","ANALISTA DE DESEMBOLSO","ANALISTA OPERATIVO",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","ANALISTA DE ESTRATEGIA COMERCIAL","ANALISTA OPERATIVO",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","DILIGENCIADORA","ANALISTA OPERATIVO",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7",null,"ACTIVO",Replacer.ReplaceValue,{"Estado"}),
+    #"Valor reemplazado9" = Table.ReplaceValue(#"Valor reemplazado8",null,"NO TIENE PERMISO PARA RADICAR",Replacer.ReplaceValue,{"Estado Colpatria"}),
+    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado9",null,"NO TIENE PERMISO PARA RADICAR",Replacer.ReplaceValue,{"Estado Bayport"}),
+    #"Filas ordenadas" = Table.Sort(#"Valor reemplazado11",{{"RADICACION AV VILLAS", Order.Descending}}),
+    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Filas ordenadas",{{"Fecha de Ingreso", type date}}),
+    #"Valor reemplazado15" = Table.ReplaceValue(#"Tipo cambiado1","ACTIVO_Pend Documentos","ACTIVO",Replacer.ReplaceText,{"Estado"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado15","AUXILIAR OPERATIVO","ANALISTA OPERATIVO",Replacer.ReplaceText,{"Cargo"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Valor reemplazado2","ASESOR DE GESTIÓN COMERCIAL","ANALISTA OPERATIVO",Replacer.ReplaceText,{"Cargo"}),
+    #"Otras columnas quitadas1" = Table.SelectColumns(#"Valor reemplazado",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "Estado Colpatria", "Estado Bayport", "RADICACION AV VILLAS"}),
+    #"Columna condicional agregada" = Table.AddColumn(#"Otras columnas quitadas1", "ESTADO AV VILLAS", each if [Estado] = "RETIRADO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA SENIOR OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECCIÓN DE OPERACIONES" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GESTORA OPERATIVA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTORA COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GERENTE COMERCIAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR JUNIOR" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else "AV VILLAS"),
+    #"Columna condicional agregada1" = Table.AddColumn(#"Columna condicional agregada", "ESTADO AVISTA", each if [Estado] = "RETIRADO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA SENIOR OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECCIÓN DE OPERACIONES" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GESTORA OPERATIVA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTORA COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GERENTE COMERCIAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR JUNIOR" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else "AVISTA"),
+    #"Columna condicional agregada2" = Table.AddColumn(#"Columna condicional agregada1", "ESTADO COLTEFINANCIERA", each if [Estado] = "RETIRADO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA SENIOR OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECCIÓN DE OPERACIONES" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GESTORA OPERATIVA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTORA COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GERENTE COMERCIAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR JUNIOR" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else "COLTEFINANCIERA"),
+    #"Personalizada agregada3" = Table.AddColumn(#"Columna condicional agregada2", "ESTADO SUDAMERIS", each if [Estado] = "RETIRADO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA SENIOR OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECCIÓN DE OPERACIONES" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GESTORA OPERATIVA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTORA COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GERENTE COMERCIAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR JUNIOR" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else "BANCO SUDAMERIS"),
+    #"Columna condicional agregada3" = Table.AddColumn(#"Personalizada agregada3", "ESTADO OCCIDENTE", each if [Estado] = "RETIRADO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA SENIOR OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECCIÓN DE OPERACIONES" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GESTORA OPERATIVA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTORA COMERCIAL NACIONAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "GERENTE COMERCIAL" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR JUNIOR" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "COORDINADOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else "OCCIDENTE"),
+    #"Columnas reordenadas2" = Table.ReorderColumns(#"Columna condicional agregada3",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "RADICACION AV VILLAS", "Estado Colpatria", "ESTADO AV VILLAS", "Estado Bayport", "ESTADO AVISTA", "ESTADO COLTEFINANCIERA"}),
+    #"Columna duplicada" = Table.DuplicateColumn(#"Columnas reordenadas2", "ESTADO AVISTA", "ESTADO AVISTA - Copia"),
+    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columna duplicada",{{"ESTADO AVISTA - Copia", "ESTADO CSC"}}),
+    #"Columnas reordenadas3" = Table.ReorderColumns(#"Columnas con nombre cambiado2",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "RADICACION AV VILLAS", "Estado Colpatria", "ESTADO AV VILLAS", "Estado Bayport", "ESTADO CSC", "ESTADO AVISTA", "ESTADO COLTEFINANCIERA"}),
+    #"Consultas combinadas2" = Table.NestedJoin(#"Columnas reordenadas3", {"Numero"}, Sudameris, {"NUMEROCC"}, "Sudameris", JoinKind.LeftOuter),
+    #"Se expandió Sudameris1" = Table.ExpandTableColumn(#"Consultas combinadas2", "Sudameris", {"NUMEROCC"}, {"Sudameris.NUMEROCC"}),
+    #"Personalizada agregada" = Table.AddColumn(#"Se expandió Sudameris1", "RADICACION GNB SUDAMERIS", each if [Sudameris.NUMEROCC] <> null then "SI" else "NO"),
+    #"Columnas reordenadas4" = Table.ReorderColumns(#"Personalizada agregada",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "RADICACION AV VILLAS", "RADICACION GNB SUDAMERIS", "Estado Colpatria", "ESTADO AV VILLAS", "Estado Bayport", "ESTADO CSC", "ESTADO AVISTA", "ESTADO COLTEFINANCIERA", "Sudameris.NUMEROCC"}),
+    #"Consultas combinadas3" = Table.NestedJoin(#"Columnas reordenadas4", {"Numero"}, AUTORIZADOS_POPULAR, {"No. De Identificación"}, "AUTORIZADOS_POPULAR", JoinKind.LeftOuter),
+    #"Se expandió AUTORIZADOS_POPULAR" = Table.ExpandTableColumn(#"Consultas combinadas3", "AUTORIZADOS_POPULAR", {"No. De Identificación"}, {"AUTORIZADOS_POPULAR.No. De Identificación"}),
+    #"Personalizada agregada1" = Table.AddColumn(#"Se expandió AUTORIZADOS_POPULAR", "RADICACION BANCO POPULAR", each if[AUTORIZADOS_POPULAR.No. De Identificación] <> null and [Cargo] = "ANALISTA OPERATIVO" then "NO"
+
+else 
+
+if [AUTORIZADOS_POPULAR.No. De Identificación] <> null and [Cargo] = "ANALISTA SENIOR OPERATIVO" then "NO"
+
+else 
+
+if [AUTORIZADOS_POPULAR.No. De Identificación] <> null and [Cargo] = "DIRECCIÓN DE OPERACIONES" then "NO"
+
+else
+
+if [AUTORIZADOS_POPULAR.No. De Identificación] <> null then "SI"
+
+else 
+
+"NO"),
+    #"Columnas reordenadas5" = Table.ReorderColumns(#"Personalizada agregada1",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "RADICACION AV VILLAS", "RADICACION GNB SUDAMERIS", "RADICACION BANCO POPULAR", "Estado Colpatria", "ESTADO AV VILLAS", "Estado Bayport", "ESTADO CSC", "ESTADO AVISTA", "ESTADO COLTEFINANCIERA", "Sudameris.NUMEROCC", "AUTORIZADOS_POPULAR.No. De Identificación"}),
+    #"Personalizada agregada2" = Table.AddColumn(#"Columnas reordenadas5", "ESTADO POPULAR", each if [Estado] = "RETIRADO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "ANALISTA SENIOR OPERATIVO" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECTOR DE OFICINA" then "NO TIENE PERMISO PARA RADICAR" else if [Cargo] = "DIRECCIÓN DE OPERACIONES" then "NO TIENE PERMISO PARA RADICAR" else if [RADICACION BANCO POPULAR] = "SI" then "BANCO POPULAR" else "BANCO POPULAR"),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Personalizada agregada2",{"ESTADO CSC", "ESTADO AVISTA"}),
+    #"Columnas reordenadas6" = Table.ReorderColumns(#"Columnas quitadas",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "RADICACION AV VILLAS", "RADICACION GNB SUDAMERIS", "RADICACION BANCO POPULAR", "Estado Colpatria", "ESTADO AV VILLAS", "ESTADO POPULAR", "Estado Bayport", "ESTADO COLTEFINANCIERA", "Sudameris.NUMEROCC", "AUTORIZADOS_POPULAR.No. De Identificación"}),
+    #"Columnas quitadas1" = Table.RemoveColumns(#"Columnas reordenadas6",{"Estado Colpatria", "Estado Bayport", "ESTADO COLTEFINANCIERA", "Sudameris.NUMEROCC", "AUTORIZADOS_POPULAR.No. De Identificación"}),
+    #"Personalizada agregada5" = Table.AddColumn(#"Columnas quitadas1", "Personalizado", each if [Cargo] = "ANALISTA OPERATIVO" and [RADICACION BANCO POPULAR] = "SI" then "NO"
+
+else
+
+if [Cargo] ="ANALISTA SENIOR OPERATIVO" and [RADICACION BANCO POPULAR] = "SI" then "NO"
+
+else
+
+[RADICACION BANCO POPULAR]),
+    #"Columnas reordenadas7" = Table.ReorderColumns(#"Personalizada agregada5",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "RADICACION AV VILLAS", "RADICACION GNB SUDAMERIS", "Personalizado", "RADICACION BANCO POPULAR", "ESTADO AV VILLAS", "ESTADO POPULAR", "ESTADO SUDAMERIS"}),
+    #"Columnas quitadas3" = Table.RemoveColumns(#"Columnas reordenadas7",{"RADICACION BANCO POPULAR"}),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas quitadas3",{{"Personalizado", "RADICACION BANCO POPULAR"}}),
+    #"Valor reemplazado10" = Table.ReplaceValue(#"Columnas con nombre cambiado1","CARTAHENA","CARTAGENA",Replacer.ReplaceText,{"Oficina"}),
+    #"FILTRO SACO NULO" = Table.SelectRows(#"Valor reemplazado10", each ([Numero] <> null)),
+    #"Filas ordenadas1" = Table.Sort(#"FILTRO SACO NULO",{{"Oficina", Order.Ascending}, {"Nombre Completo", Order.Ascending}}),
+    #"Valor reemplazado12" = Table.ReplaceValue(#"Filas ordenadas1","Vinculacion pendiente","VINCULACION PENDIENTE",Replacer.ReplaceValue,{"Estado"}),
+    #"Consultas combinadas1" = Table.NestedJoin(#"Valor reemplazado12", {"Numero"}, Occidente, {"CC"}, "Occidente", JoinKind.LeftOuter),
+    #"Se expandió Occidente" = Table.ExpandTableColumn(#"Consultas combinadas1", "Occidente", {"ESTADO"}, {"Occidente.ESTADO"}),
+    #"Valor reemplazado13" = Table.ReplaceValue(#"Se expandió Occidente",null,"NO",Replacer.ReplaceValue,{"Occidente.ESTADO"}),
+    #"Valor reemplazado14" = Table.ReplaceValue(#"Valor reemplazado13","AUTORIZADO - ACTIVO","SI",Replacer.ReplaceText,{"Occidente.ESTADO"}),
+    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Valor reemplazado14",{{"Occidente.ESTADO", "RADICACION OCCIDENTE"}}),
+    #"Columnas reordenadas8" = Table.ReorderColumns(#"Columnas con nombre cambiado3",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado", "RADICACION AV VILLAS", "RADICACION GNB SUDAMERIS", "RADICACION BANCO POPULAR", "RADICACION OCCIDENTE", "ESTADO AV VILLAS", "ESTADO POPULAR", "ESTADO SUDAMERIS", "ESTADO OCCIDENTE"}),
+    #"Valor reemplazado16" = Table.ReplaceValue(#"Columnas reordenadas8","OCCIDENTE","BANCO DE OCCIDENTE",Replacer.ReplaceText,{"ESTADO OCCIDENTE"}),
+    #"Valor reemplazado17" = Table.ReplaceValue(#"Valor reemplazado16","ANALISTA OPERATIVO OFICINA","ANALISTA OPERATIVO",Replacer.ReplaceValue,{"Cargo"})
+in
+    #"Valor reemplazado17"
+// OPERATIVOS
+let
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2026\01_Enero 2026\Plantilla Nueva Fuerza  Comercial Enero 2026.xlsx"), null, true),
+    Analistas_Operativos_Table = Origen{[Item="Analistas_Operativos",Kind="Table"]}[Data],
+    #"Tipo cambiado1" = Table.TransformColumnTypes(Analistas_Operativos_Table,{{"Tipo", type text}, {"Numero", Int64.Type}, {"ESPECIAL", Int64.Type}, {"Nombre Completo", type text}, {"Cargo", type text}, {"Fecha de Ingreso", type date}, {"OFICINA HOMOLOGADA", type text}, {"REGIONAL", type text}, {"Oficina", type text}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", type text}, {"Correo Electronico Corporativo", type any}, {"Estado", type text}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Tipo cambiado1",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Estado"}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Otras columnas quitadas",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina"}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Columnas reordenadas", {"Numero"}, #"Av Villas", {"CC"}, "Tabla56", JoinKind.LeftOuter),
+    #"Se expandió Tabla56" = Table.ExpandTableColumn(#"Consultas combinadas", "Tabla56", {"ESTADO"}, {"Tabla56.ESTADO"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió Tabla56",{{"Tabla56.ESTADO", "RADICACION AV VILLAS"}}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Columnas con nombre cambiado","AUTORIZADO - ACTIVO","SI",Replacer.ReplaceText,{"RADICACION AV VILLAS"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3",null,"NO",Replacer.ReplaceValue,{"RADICACION AV VILLAS"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Valor reemplazado4","AUXILIAR OPERATIVO OFICINA","AUXILIAR OPERATIVO",Replacer.ReplaceText,{"Cargo"}),
+    #"Filas filtradas" = Table.SelectRows(#"Valor reemplazado", each true)
+in
+    #"Filas filtradas"
+//Base_Fuerza_Comercial Cargue Final
+let
+    Origen = Base_Fuerza_Comercial,
+    #"Consulta anexada" = Table.Combine({Origen, PUENTE_CONSOLIDADO_DOBLE_DIRECCION}),
+    #"Columna duplicada" = Table.DuplicateColumn(#"Consulta anexada", "Numero", "Numero - Copia.1"),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Columna duplicada",{{"Numero - Copia.1", type text}}),
+    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado", "Personalizado.1", each [#"Numero - Copia.1"]&[Oficina]&[Cargo]),
+    #"Duplicados quitados" = Table.Distinct(#"Personalizada agregada", {"Personalizado.1"}),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Duplicados quitados",{"Numero - Copia.1", "Personalizado.1"})
+in
+    #"Columnas quitadas"
+
+// 1_Base_Fuerza_Comercial_ADICIONALES DOBLE DIRECTOR
+let
+    Origen = Base_Fuerza_Comercial,
+    #"Filas filtradas1" = Table.SelectRows(Origen, each ([Cargo] <> "DIRECTOR DE OFICINA")),
+    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas1", {"Oficina"}, #"TABLA PARA DUPLICAR OFICINAS", {"OFICINA 1"}, "TABLA PARA DUPLICAR OFICINAS", JoinKind.LeftOuter),
+    #"Se expandió TABLA PARA DUPLICAR OFICINAS" = Table.ExpandTableColumn(#"Consultas combinadas", "TABLA PARA DUPLICAR OFICINAS", {"OFICINA 1", "OFICINA 2"}, {"TABLA PARA DUPLICAR OFICINAS.OFICINA 1", "TABLA PARA DUPLICAR OFICINAS.OFICINA 2"}),
+    #"Filas filtradas" = Table.SelectRows(#"Se expandió TABLA PARA DUPLICAR OFICINAS", each ([TABLA PARA DUPLICAR OFICINAS.OFICINA 1] <> null)),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Filas filtradas",{"Oficina"}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "TABLA PARA DUPLICAR OFICINAS.OFICINA 2", "Estado", "RADICACION AV VILLAS", "RADICACION GNB SUDAMERIS", "RADICACION BANCO POPULAR", "RADICACION OCCIDENTE", "ESTADO AV VILLAS", "ESTADO POPULAR", "ESTADO SUDAMERIS", "ESTADO OCCIDENTE", "TABLA PARA DUPLICAR OFICINAS.OFICINA 1"}),
+    #"Columnas quitadas1" = Table.RemoveColumns(#"Columnas reordenadas",{"TABLA PARA DUPLICAR OFICINAS.OFICINA 1"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas quitadas1",{{"TABLA PARA DUPLICAR OFICINAS.OFICINA 2", "Oficina"}}),
+    #"Filas ordenadas" = Table.Sort(#"Columnas con nombre cambiado",{{"Cargo", Order.Ascending}}),
+    #"Filas filtradas2" = Table.SelectRows(#"Filas ordenadas", each ([Cargo] = "ASESOR ELITE ESPECIAL" or [Cargo] = "ASESOR FREE LANCE" or [Cargo] = "ASESOR FREE LANCE ELITE ESPECIAL" or [Cargo] = "ASESOR NODO")),
+    #"Filas filtradas3" = Table.SelectRows(#"Filas filtradas2", each [Numero] <= 0)
+in
+    #"Filas filtradas3"
+
+// 2_Base_Fuerza_Comercial_ADICIONALES DOBLE DIRECTOR
+let
+    Origen = Base_Fuerza_Comercial,
+    #"Consultas combinadas" = Table.NestedJoin(Origen, {"Oficina"}, #"TABLA PARA DUPLICAR OFICINAS", {"OFICINA 2"}, "TABLA PARA DUPLICAR OFICINAS", JoinKind.LeftOuter),
+    #"Se expandió TABLA PARA DUPLICAR OFICINAS" = Table.ExpandTableColumn(#"Consultas combinadas", "TABLA PARA DUPLICAR OFICINAS", {"OFICINA 1", "OFICINA 2"}, {"TABLA PARA DUPLICAR OFICINAS.OFICINA 1", "TABLA PARA DUPLICAR OFICINAS.OFICINA 2"}),
+    #"Filas filtradas" = Table.SelectRows(#"Se expandió TABLA PARA DUPLICAR OFICINAS", each ([TABLA PARA DUPLICAR OFICINAS.OFICINA 2] <> null)),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Filas filtradas",{"Oficina"}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "TABLA PARA DUPLICAR OFICINAS.OFICINA 1", "Estado", "RADICACION AV VILLAS", "RADICACION GNB SUDAMERIS", "RADICACION BANCO POPULAR", "RADICACION OCCIDENTE", "ESTADO AV VILLAS", "ESTADO POPULAR", "ESTADO SUDAMERIS", "ESTADO OCCIDENTE", "TABLA PARA DUPLICAR OFICINAS.OFICINA 2"}),
+    #"Columnas quitadas1" = Table.RemoveColumns(#"Columnas reordenadas",{"TABLA PARA DUPLICAR OFICINAS.OFICINA 2"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas quitadas1",{{"TABLA PARA DUPLICAR OFICINAS.OFICINA 1", "Oficina"}}),
+    #"Filas filtradas1" = Table.SelectRows(#"Columnas con nombre cambiado", each ([Cargo] = "ASESOR ELITE ESPECIAL" or [Cargo] = "ASESOR FREE LANCE" or [Cargo] = "ASESOR FREE LANCE ELITE ESPECIAL")),
+    #"Filas ordenadas" = Table.Sort(#"Filas filtradas1",{{"Cargo", Order.Ascending}}),
+    #"Filas filtradas2" = Table.SelectRows(#"Filas ordenadas", each [Numero] <= 0)
+in
+    #"Filas filtradas2"
+
+// CONSOLIDADO DOBLE DIRECCION
+
+let
+    Origen = Table.Combine({#"1_Base_Fuerza_Comercial_ADICIONALES DOBLE DIRECTOR", #"2_Base_Fuerza_Comercial_ADICIONALES DOBLE DIRECTOR"})
+in
+    Origen
+
+//PUENTE_CONSOLIDADO_DOBLE_DIRECCION
+
+let
+    Origen = Excel.CurrentWorkbook(){[Name="CONSOLIDADO_DOBLE_DIRECCION"]}[Content]
+in
+    Origen
+
+//TABLA PARA DUPLICAR OFICINAS
+
+let
+    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"OFICINA 1" = _t, #"OFICINA 2" = _t]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"OFICINA 1", type text}, {"OFICINA 2", type text}}),
+    #"Filas ordenadas" = Table.Sort(#"Tipo cambiado",{{"OFICINA 2", Order.Ascending}})
+in
+    #"Filas ordenadas"
+
+//AV VILLAS
+let
+    Origen = Excel.CurrentWorkbook(){[Name="Tabla56"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CC", Int64.Type},{"ESTADO", type text}})
+in
+    #"Tipo cambiado"
+
+// Sudameris
+let
+    Origen = Excel.CurrentWorkbook(){[Name="Sudameris"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"NUMEROCC", Int64.Type},{"CONTINUA PROCESO", type text}})
+in
+    #"Tipo cambiado"
+// Occidente
+let
+    Origen = Excel.CurrentWorkbook(){[Name="TablaOccidente"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"ESTADO", type text}, {"CC", Int64.Type}})
+in
+    #"Tipo cambiado"
+// AUTORIZADOS_POPULAR
+let
+    Origen = Excel.CurrentWorkbook(){[Name="AUTORIZADOS_POPULAR"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"No. De Identificación", Int64.Type}}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Tipo cambiado", {"No. De Identificación"}, EXCLUSIONES_POPULAR, {"Documento"}, "EXCLUSIONES_POPULAR", JoinKind.LeftOuter),
+    #"Se expandió EXCLUSIONES_POPULAR" = Table.ExpandTableColumn(#"Consultas combinadas", "EXCLUSIONES_POPULAR", {"Documento"}, {"EXCLUSIONES_POPULAR.Documento"}),
+    #"Filas filtradas" = Table.SelectRows(#"Se expandió EXCLUSIONES_POPULAR", each ([EXCLUSIONES_POPULAR.Documento] = null))
+in
+    #"Filas filtradas"
+//Adicionales
+let
+    Origen = Excel.CurrentWorkbook(){[Name="Adicionales"]}[Content]
+in
+    Origen
+// EXCLUSIONES_POPULAR
+let
+    Origen = Excel.CurrentWorkbook(){[Name="EXCLUSIONES_POPULAR"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Documento", Int64.Type}, {"Nombres", type text}, {"Cargo al que será contratado", type text}, {"Ciudad de Trabajo", type text}})
+in
+    #"Tipo cambiado"
+
+//OFICINAS PARA CARGAR AL APLICATIVO
+let
+    Origen = Excel.CurrentWorkbook(){[Name="Base_Fuerza_Comercial_Cargue_Final"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Cargo", type text}, {"Fecha de Ingreso", type datetime}, {"Oficina", type text}, {"Estado", type text}, {"RADICACION AV VILLAS", type text}, {"RADICACION GNB SUDAMERIS", type text}, {"RADICACION BANCO POPULAR", type text}, {"ESTADO AV VILLAS", type text}, {"ESTADO POPULAR", type text}, {"ESTADO SUDAMERIS", type text}}),
+    #"Duplicados quitados" = Table.Distinct(#"Tipo cambiado", {"Oficina"}),
+    #"Filas ordenadas" = Table.Sort(#"Duplicados quitados",{{"Oficina", Order.Ascending}}),
+    #"Filas filtradas" = Table.SelectRows(#"Filas ordenadas", each ([Oficina] <> "BOGOTA" and [Oficina] <> "BUCARAMANGA" and [Oficina] <> "CALI" and [Oficina] <> "CARTAGENA" and [Oficina] <> "MEDELLIN")),
+    #"Filas ordenadas1" = Table.Sort(#"Filas filtradas",{{"Oficina", Order.Ascending}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas ordenadas1",{"Oficina"}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Otras columnas quitadas", {"Oficina"}, Oficinas_Regionales, {"Oficina"}, "Oficinas_Regionales", JoinKind.LeftOuter),
+    #"Se expandió Oficinas_Regionales" = Table.ExpandTableColumn(#"Consultas combinadas", "Oficinas_Regionales", {"Regional"}, {"Oficinas_Regionales.Regional"}),
+    #"Personalizada agregada" = Table.AddColumn(#"Se expandió Oficinas_Regionales", "Personalizado", each "GIOVANNA EDITH DAZA PEREZ"),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Personalizada agregada",{{"Personalizado", "ANALISTA ASIGNADO"}, {"Oficinas_Regionales.Regional", "REGIONAL"}}),
+    #"Personalizada agregada1" = Table.AddColumn(#"Columnas con nombre cambiado", "ESTADO TAREA", each ""),
+    #"Columna condicional agregada" = Table.AddColumn(#"Personalizada agregada1", "AVVILLAS", each if [Oficina] = "BOGOTA 2" then "NO" else if [Oficina] = "BUCARAMANGA 1" then "NO" else if [Oficina] = "CALI 2" then "NO" else if [Oficina] = "CARTAGENA 1" then "NO" else if [Oficina] = "MEDELLIN 2" then "NO" else if Text.Contains([Oficina], "NODO") then "SI" else if Text.Contains([Oficina], "ESPECIAL") then "SI" else "SI"),
+    #"Columna condicional agregada1" = Table.AddColumn(#"Columna condicional agregada", "SUDAMERIS", each if [Oficina] = "BOGOTA 2" then "NO" else if [Oficina] = "BUCARAMANGA 1" then "NO" else if [Oficina] = "CALI 2" then "NO" else if [Oficina] = "CARTAGENA 1" then "NO" else if [Oficina] = "MEDELLIN 2" then "NO" else if Text.Contains([Oficina], "NODO") then "SI" else if Text.Contains([Oficina], "ESPECIAL") then "SI" else "SI"),
+    #"Columna condicional agregada2" = Table.AddColumn(#"Columna condicional agregada1", "POPULAR", each if [Oficina] = "BOGOTA 2" then "SI" else if [Oficina] = "BUCARAMANGA 1" then "SI" else if [Oficina] = "CALI 2" then "SI" else if [Oficina] = "CARTAGENA 1" then "SI" else if [Oficina] = "MEDELLIN 2" then "SI" else if Text.Contains([Oficina], "NODO") then "SI" else if Text.Contains([Oficina], "ESPECIAL") then "SI" else "NO")
+in
+    #"Columna condicional agregada2"
+// Oficinas_Regionales
+let
+    Origen = Excel.CurrentWorkbook(){[Name="Oficinas_Regionales"]}[Content],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Oficina", type text}, {"Regional", type text}, {"DEPARTAMENTO", type text}, {"DEPARTAMENTO MIN", type text}})
+in
+    #"Tipo cambiado"
+
+
 
