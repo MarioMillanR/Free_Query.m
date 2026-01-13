@@ -1,0 +1,958 @@
+
+// Base Fuerza Comercial
+dejar
+    Origen = #"Bases Consolidadas (2)",
+    #"Filas ordenadas" = Table.Sort(Origen,{{"Estado", Order.Ascending}}),
+    #"Filas filtradas" = Table.SelectRows(#"Filas ordenadas", each ([Cargo] <> "ANALISTA DE DESEMBOLSO" and [Cargo] <> "ANALISTA DE ESTRATEGIAS COMERCIALES" and [Cargo] <> "ANALISTA OPERATIVO" and [Cargo] <> "ANALISTA SENIOR OPERATIVO" and [Cargo] <> "AUXILIAR OPERATIVO" and [Cargo] <> "COORDINADOR JUNIOR" y [Carga] <> "DIRECTOR ALIADO" y [Carga] <> "DIRECTOR DE OFICINA" y [Carga] <> "DIRECTOR NACIONAL COMERCIAL" y [Carga] <> "DIRECTOR REGIONAL" y [Carga] <> "DIRECTORA OPERATIVA" y [Carga] <> "GESTION VIRTUAL AV VILLAS")),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas",{"Numero", "Nombre Completo", "Cargo", "Genero", "Fecha de Ingreso", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliacion", "AFP", "Estado", "NODO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "EQUIPO AGENTE EXCLUSIVO ELITE", "ESTADO OCCIDENTE"}),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Otras columnas quitadas",{{"Numero", Int64.Type}, {"Nombre Completo", escriba texto}, {"Cargo", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electrónico Personal", escriba texto}, {"Correo Electrónico Corporativo", Int64.Type}, {"Estado", escriba texto}, {"Estado Colpatria", escriba texto}, {"Estado Av Villas", escriba texto}, {"Estado Bayport", escriba texto}, {"Estado CSC", escriba texto}}),
+    #"Filas ordenadas1" = Table.Sort(#"Tipo cambiado",{{"Estado", Order.Ascending}, {"Numero", Order.Ascending}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Filas ordenadas1","BOGOTA1","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Columna duplicada" = Table.DuplicateColumn(#"Valor reemplazado", "Nombre Completo", "Nombre Completo - Copia"),
+    #"Poner En Mayúsculas Cada Palabra" = Table.TransformColumns(#"Columna duplicada",{{"Nombre Completo - Copia", Text.Proper, type text}}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Poner En Mayúsculas Cada Palabra","X",null,Replacer.ReplaceValue,{"EPS"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado1","BACHILLER",null,Replacer.ReplaceValue,{"EPS"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado3","x",null,Replacer.ReplaceValue,{"EPS"}),
+    #"Consulta anexada" = Table.Combine({#"Valor reemplazado2", #"Directores Oficina"}),
+    Personalizado1 = #"Consulta anexada",
+    #"FILTRO ESTADO" = Table.SelectRows(Personalizado1, each ([Estado] <> "RETIRADO")),
+    #"Duplicados quitados" = Table.Distinct(#"FILTRO ESTADO", {"Numero"}),
+    #"OJO ASESORES ELITE ESPECIAL Personalizada agregada" = Table.AddColumn(#"Duplicados quitados", "Personalizado", each if [Nombre Completo]="MARGARITA MOLINA ROJAS" and [Cargo]="ASESOR ELITE ESPECIAL" then "BOGOTA_ASESOR ELITE ESPECIAL_MARGARITA MOLINA ROJAS" 
+demás 
+if [Nombre Completo]="LUZ ADRIANA PINO ALZATE" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "CALI_ASESOR ELITE ESPECIAL_LUZ ADRIANA PINO ALZATE" 
+demás
+if [Nombre Completo]="JAIME ANDRES CAICEDO GUZMAN" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JAIME ANDRES CAICEDO GUZMAN"
+demás 
+si [Nombre Completo]="LEONARDO JIMENEZ" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "CUCUTA_ASESOR ELITE ESPECIAL_LEONARDO JIMENEZ"
+demás
+if [Nombre Completo]="RICARDO ANTONIO ESGUERRA GARCIA" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_RICARDO ANTONIO ESGUERRA GARCIA"
+demás
+if [Nombre Completo]="JOSE GUILLERMO LEON BARRETO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+if [Nombre Completo]="JOAN STEVEN ACEROS VESGA" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_JOAN STEVEN ACEROS VESGA"
+demás
+if [Nombre Completo]="MELISSA FERNANDA CAÑAS URIBE" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_MELISSA FERNANDA CAÑAS URIBE"
+demás
+if [Nombre Completo]="YESID ARLEY MARTINEZ MANCILLA" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_YESID ARLEY MARTINEZ MANCILLA"
+demás
+if [Nombre Completo]="SHIRLEY GENOVER HURTADO HURTADO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "POPAYAN_ASESOR ELITE ESPECIAL_SHIRLEY GENOVER HURTADO HURTADO"
+demás
+if [Nombre Completo]="CARLOS AUGUSTO JACOME ALVAREZ" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+if [Nombre Completo]="LUIS EUGENIO BOTERO JARAMILLO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_LUIS EUGENIO BOTERO JARAMILLO"
+demás
+if [Nombre Completo]="ANGIE PAOLA MENDOZA TRUJILLO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "CARTAGENA_ASESOR ELITE ESPECIAL_ANGIE PAOLA MENDOZA TRUJILLO"
+demás
+if [Nombre Completo]="YERLY MARITZA GARCIA RIVEROS" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_YERLY MARITZA GARCIA RIVEROS"
+demás
+
+
+//
+
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "MARGARITA MOLINA ROJAS" entonces "BOGOTA_ASESOR ELITE ESPECIAL_MARGARITA MOLINA ROJAS" 
+demás 
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "LUZ ADRIANA PINO ALZATE" entonces "CALI_ASESOR ELITE ESPECIAL_LUZ ADRIANA PINO ALZATE" 
+demás 
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "JAIME ANDRES CAICEDO GUZMAN" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JAIME ANDRES CAICEDO GUZMAN" 
+demás
+si [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "LEONARDO JIMENEZ" entonces "CUCUTA_ASESOR ELITE ESPECIAL_LEONARDO JIMENEZ"
+demás
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "RICARDO ANTONIO ESGUERRA GARCIA" entonces "BOGOTA_ASESOR ELITE ESPECIAL_RICARDO ANTONIO ESGUERRA GARCIA"
+demás
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "JOSE GUILLERMO LEON BARRETO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "JOAN STEVEN ACEROS VESGA" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_JOAN STEVEN ACEROS VESGA"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "MELISSA FERNANDA CAÑAS URIBE" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_MELISSA FERNANDA CAÑAS URIBE"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "YESID ARLEY MARTINEZ MANCILLA" entonces "BOGOTA_ASESOR ELITE ESPECIAL_YESID ARLEY MARTINEZ MANCILLA"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "SHIRLEY GENOVER HURTADO HURTADO" entonces "POPAYAN_ASESOR ELITE ESPECIAL_SHIRLEY GENOVER HURTADO HURTADO"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "CARLOS AUGUSTO JACOME ALVAREZ" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO" y [Nombre Jefe Directo]= "CARLOS AUGUSTO JACOME ALVAREZ" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO_ELITE" y [Nombre Jefe Directo]= "CARLOS AUGUSTO JACOME ALVAREZ" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE_ELITE" y [Nombre Jefe Directo]= "JORGE RAFAEL NATERA CONSUEGRA" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "LUIS EUGENIO BOTERO JARAMILLO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_LUIS EUGENIO BOTERO JARAMILLO"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO" y [Nombre Jefe Directo]= "JOSE GUILLERMO LEON BARRETO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO_ELITE" y [Nombre Jefe Directo]= "JOSE GUILLERMO LEON BARRETO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+si [Cargo]= "ASESOR FREE LANCE_ELITE" y [Nombre Jefe Directo]= "JOSE REINALDO RODRIGUEZ SALDAÑA" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+if [Cargo]= "ASESOR FREE LANCE_ELITE" y [Nombre Jefe Directo]= "ANGIE PAOLA MENDOZA TRUJILLO" entonces "CARTAGENA_ASESOR ELITE ESPECIAL_ANGIE PAOLA MENDOZA TRUJILLO"
+demás
+if [Cargo]= "ASESOR FREE LANCE_ELITE" y [Nombre Jefe Directo]= "YERLY MARITZA GARCIA RIVEROS" entonces "BOGOTA_ASESOR ELITE ESPECIAL_YERLY MARITZA GARCIA RIVEROS"
+demás
+[Oficina]),
+    #"Columnas quitadas" = Table.RemoveColumns(#"OJO ASESORES ELITE ESPECIAL Personalizada agregada",{"Oficina"}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Columnas quitadas",{"Numero", "Nombre Completo", "Cargo", "Genero", "Fecha de Ingreso", "Personalizado", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliacion", "AFP", "Estado", "NODO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Tipo"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas reordenadas",{{"Personalizado", "Oficina"}}),
+    #"Consulta anexada1" = Table.Combine({#"Columnas con nombre cambiado", ADICIONAL}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Consulta anexada1","BOGOTA_NODO MULTIBANKA SAS","MULTIBANKA 1",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","MEDELLIN_CARLOS ALFREDO LICONA DE LA ROSA","MEDELLIN_NODO CARLOS ALFREDO LICONA DE LA ROSA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","BARRANQUILLA","BARRANQUILLA 1",Replacer.ReplaceValue,{"Oficina"})
+en
+    #"Valor reemplazado6"
+
+//Directores de oficinas
+dejar
+    Origen = #"Bases Consolidadas (2)",
+    #"Filas filtradas" = Table.SelectRows(Origen, each ([Cargo] <> "ANALISTA OPERATIVO" and [Cargo] <> "ASESOR ELITE ESPECIAL" and [Cargo] <> "ASESOR FREE LANCE" and [Cargo] <> "ASESOR FREE LANCE ELITE ESPECIAL" and [Cargo] <> "ASESOR NODO" and [Cargo] <> "CONTRATISTA DIRECTOR REGIONAL" y [Carga] <> "COORDINADOR JUNIOR" y [Carga] <> "DIRECTOR NACIONAL COMERCIAL" y [Carga] <> "DIRECTOR REGIONAL" y [Carga] <> "DIRECTORA OPERATIVA" y [Carga] <> "GERENTE ADMINISTRATIVO" y [Carga] <> "GERENTE COMERCIAL")),
+    #"Filas filtradas2" = Table.SelectRows(#"Filas filtradas", each ([Estado] <> "RETIRADO")),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas2",{"Tipo", "Numero", "Nombre Completo", "Cargo", "Genero", "Fecha de Ingreso", "Oficina", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Corporativo", "Estado", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Otras columnas quitadas","DIRECTOR DE OFICINA SINCELEJO Y MONTERIA","DIRECTOR DE OFICINA",Replacer.ReplaceText,{"Cargo"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","DIRECTOR DE OFICINA ARMENIA Y PEREIRA","DIRECTOR DE OFICINA",Replacer.ReplaceText,{"Cargo"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","BOGOTA2","BOGOTA 2",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","BOGOTA1","BOGOTA 1",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","DIRECTOR OFICINA 3","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado4","DIRECTOR OFICINA ","DIRECTOR DE OFICINA ",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado5",3219994684,3043846551,Replacer.ReplaceValue,{"Celular Personal"}),
+    #"Valor reemplazado9" = Table.ReplaceValue(#"Valor reemplazado8",3163419893,3214461167,Replacer.ReplaceValue,{"Celular Personal"}),
+    #"Valor reemplazado10" = Table.ReplaceValue(#"Valor reemplazado9","DIRECTOR DE OFICINA SINCELEJO","DIRECTOR DE OFICINA",Replacer.ReplaceText,{"Cargo"}),
+    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado10","DIRECTOR DE OFICINA ENCARGADO","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"})
+en
+    #"Valor reemplazado11"
+
+    //Analistas Operativos 
+    dejar
+    Origen = #"Bases Consolidadas (2)",
+    #"Filas ordenadas" = Table.Sort(Origen,{{"Fecha de Ingreso", Order.Descending}}),
+    #"Filas filtradas" = Table.SelectRows(#"Filas ordenadas", each ([Cargo] = "ANALISTA DE DESEMBOLSO" or [Cargo] = "ANALISTA DE ESTRATEGIA COMERCIAL" or [Cargo] = "ANALISTA DE VALIDACION" or [Cargo] = "ANALISTA OPERATIVO" or [Cargo] = "ANALISTA OPERATIVO OFICINA" or [Cargo] = "ANALISTA OPERATIVO PERFILAMIENTO" o [Cargo] = "ANALISTA OPERATIVO SENIOR" o [Cargo] = "ANALISTA SENIOR OPERATIVO" o [Cargo] = "ASESOR DE GESTIÓN COMERCIAL" o [Cargo] = "AUXILIAR OPERATIVO" o [Cargo] = "AUXILIAR OPERATIVO OFICINA" o [Cargo] = "AUXILIAR VALIDACION" o [Cargo] = "DILIGENCIADORA" o [Cargo] = "GESTORA OPERATIVA" o [Carga] = "SUPERVISORA OPERATIVA" o [Carga] = "VALIDADOR DOCUMENTAL")),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Filas filtradas","ANALISTA OPERATIVO SENIOR","ANALISTA SENIOR OPERATIVO",Replacer.ReplaceText,{"Cargo"}),
+    #"Filas filtradas1" = Table.SelectRows(#"Valor reemplazado4", each ([Estado] = "ACTIVO")),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas1",{"Tipo", "Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "Oficina", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Corporativo", "Estado"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Otras columnas quitadas","DIRECTOR DE OFICINA SINCELEJO Y MONTERIA","DIRECTOR DE OFICINA",Replacer.ReplaceText,{"Cargo"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","DIRECTOR DE OFICINA ARMENIA Y PEREIRA","DIRECTOR DE OFICINA",Replacer.ReplaceText,{"Cargo"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","BOGOTA2","BOGOTA 2",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","BOGOTA1","BOGOTA 1",Replacer.ReplaceValue,{"Oficina"}),
+    #"Duplicados quitados" = Table.Distinct(#"Valor reemplazado3", {"Numero"})
+en
+    #"Duplicados quitados"
+
+    //CONSOLIDADOS PARA CONSULTAS (7) CONSOLIDADOS BASES_2
+
+    dejar
+    Origen = Table.Combine({#"Planta (2)", #"Free (2)", ADICIONAL}),
+    #"Filas ordenadas" = Table.Sort(Origen,{{"Estado", Order.Ascending}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas ordenadas",{"Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "ESTADO FILTRO", "NODO", "Contrato Vantage", "Fecha Contrato Vantage", "Retiro Contrato Vantage", "Contrato Colfinactiva", "Fecha Contrato Colfinactiva", "Estado Onest", "Retiro Contrato Colfinactiva", "Contrato Onest", "Fecha Contrato Onest", "Retiro Contrato Onest"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Otras columnas quitadas","Á","A",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","É","E",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Í","I",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Ó","O",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Ú","U",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado4","BOGOTACALLE94","BOGOTA",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","BOGOTA/CARTAGENA","BOGOTA",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7","SANTAMARTA","SANTA MARTA",Replacer.ReplaceText,{"Oficina"}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Valor reemplazado8",{"Numero"},#"Colpatria (2)",{"CEDULA"},"Colpatria",JoinKind.LeftOuter),
+    #"Se expandió Colpatria" = Table.ExpandTableColumn(#"Consultas combinadas", "Colpatria", {"PRODUCTO"}, {"Colpatria.PRODUCTO"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió Colpatria",{{"Colpatria.PRODUCTO", "Estado Colpatria"}}),
+    #"Consultas combinadas1" = Table.NestedJoin(#"Columnas con nombre cambiado",{"Numero"},#"Av_Villas (2)",{"CEDULA"},"Av_Villas",JoinKind.LeftOuter),
+    #"Se expandió Av_Villas" = Table.ExpandTableColumn(#"Consultas combinadas1", "Av_Villas", {"PRODUCTO"}, {"Av_Villas.PRODUCTO"}),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Se expandió Av_Villas",{{"Av_Villas.PRODUCTO", "Estado Av Villas"}}),
+    #"Consultas combinadas2" = Table.NestedJoin(#"Columnas con nombre cambiado1",{"Numero"},#"Bayport (2)",{"CEDULA"},"Bayport",JoinKind.LeftOuter),
+    #"Se expandió Bayport" = Table.ExpandTableColumn(#"Consultas combinadas2", "Bayport", {"PRODUCTO"}, {"Bayport.PRODUCTO"}),
+    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Se expandió Bayport",{{"Bayport.PRODUCTO", "Estado Bayport"}}),
+    #"Consultas combinadas3" = Table.NestedJoin(#"Columnas con nombre cambiado2",{"Numero"},#"CSC (2)",{"CEDULA"},"CSC",JoinKind.LeftOuter),
+    #"Se expandió CSC" = Table.ExpandTableColumn(#"Consultas combinadas3", "CSC", {"PRODUCTO"}, {"CSC.PRODUCTO"}),
+    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Se expandió CSC",{{"CSC.PRODUCTO", "Estado CSC"}}),
+    #"Valor reemplazado9" = Table.ReplaceValue(#"Columnas con nombre cambiado3","JOHN MAYKOL CÁRDENAS HOYOS","JOHN MAYKOL CARDENAS HOYOS",Replacer.ReplaceText,{"Nombre Jefe Directo"}),
+    #"Valor reemplazado10" = Table.ReplaceValue(#"Valor reemplazado9","Retiro","RETIRADO",Replacer.ReplaceText,{"Estado"}),
+    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado10","Activo","ACTIVO",Replacer.ReplaceText,{"Estado"}),
+    #"Valor reemplazado12" = Table.ReplaceValue(#"Valor reemplazado11"," "," ",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Texto recortado" = Table.TransformColumns(#"Valor reemplazado12",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Valor reemplazado13" = Table.ReplaceValue(#"Texto recortado","-SFI","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado14" = Table.ReplaceValue(#"Valor reemplazado13","LINA MARÍA GARCÍA RUIZ","LINA MARIA GARCIA RUIZ",Replacer.ReplaceValue,{"Nombre Jefe Directo"}),
+    #"Valor reemplazado15" = Table.ReplaceValue(#"Valor reemplazado14"," "," ",Replacer.ReplaceText,{"Nombre Jefe Directo"}),
+    #"Texto recortado1" = Table.TransformColumns(#"Valor reemplazado15",{{"Nombre Jefe Directo", Text.Trim, type text}}),
+    #"Valor reemplazado16" = Table.ReplaceValue(#"Texto recortado1","JOHANA LEON","JOHANA MILENA LEON SUDEA",Replacer.ReplaceValue,{"Nombre Jefe Directo"}),
+    #"Valor reemplazado17" = Table.ReplaceValue(#"Valor reemplazado16","-PROFINZNAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado18" = Table.ReplaceValue(#"Valor reemplazado17","-PROFINANZAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado19" = Table.ReplaceValue(#"Valor reemplazado18","PROFINANZAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Texto recortado2" = Table.TransformColumns(#"Valor reemplazado19",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Valor reemplazado20" = Table.ReplaceValue(#"Texto recortado2","RAFAEL#(00A0)ENRIQUE GUERRERO CONTRERAS","RAFAEL ENRIQUE GUERRERO CONTRERAS",Replacer.ReplaceValue,{"Nombre Completo"}),
+    #"Valor reemplazado21" = Table.ReplaceValue(#"Valor reemplazado20","DIRECTOR ENCARGADO OFICINA ARMENIA","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado22" = Table.ReplaceValue(#"Valor reemplazado21","DIRECTOR DE OFICINA_FREE","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado23" = Table.ReplaceValue(#"Valor reemplazado22","DIRECTOR DE OFICINA SINCELEJO Y MONTERIA","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Poner en mayúsculas cada palabra insertada" = Table.AddColumn(#"Valor reemplazado23", "Poner En Mayúsculas Cada Palabra", each Text.Proper([Nombre Completo]), type text),
+    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Poner en mayúsculas cada palabra insertada",{{"Poner En Mayúsculas Cada Palabra", "Nombre Completo - Copia"}}),
+    #"Filas ordenadas1" = Table.Sort(#"Columnas con nombre cambiado4",{{"Oficina", Order.Ascending}}),
+    #"Índice agregado" = Table.AddIndexColumn(#"Filas ordenadas1", "Índice", 1, 1),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Índice agregado",{"Índice", "Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Nombre Completo - Copia"}),
+    #"Columnas con nombre cambiado5" = Table.RenameColumns(#"Columnas reordenadas",{{"Índice", "No de Carta"}}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Columnas con nombre cambiado5","BOGOTA CALLE 94","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado24" = Table.ReplaceValue(#"Valor reemplazado5","BOGOTA CALLE 94/CARTAGENA","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Filas ordenadasFECHA INGRESO" = Table.Sort(#"Valor reemplazado24",{{"Fecha de Ingreso", Order.Descending}}),
+    #"Consultas combinadas4" = Table.NestedJoin(#"Filas ordenadasFECHA INGRESO", {"Numero"}, #"Consolidado Bases Activos", {"Numero"}, "Consolidado Bases Activos", JoinKind.LeftOuter),
+    #"Se expandió Consolidado Bases Activos" = Table.ExpandTableColumn(#"Consultas combinadas4", "Consolidado Bases Activos", {"Recuento"}, {"Recuento"}),
+    #"Columnas con nombre cambiado6" = Table.RenameColumns(#"Se expandió Consolidado Bases Activos",{{"Recuento", "Recuento_Activo"}}),
+    #"Consultas combinadas5" = Table.NestedJoin(#"Columnas con nombre cambiado6", {"Numero"}, #"Consolidado Bases Retirados", {"Numero"}, "Consolidado Bases Retirados", JoinKind.LeftOuter),
+    #"Se expandió Consolidado Bases Retirados" = Table.ExpandTableColumn(#"Consultas combinadas5", "Consolidado Bases Retirados", {"Recuento"}, {"Recuento"}),
+    #"Valor reemplazado26" = Table.ReplaceValue(#"Se expandió Consolidado Bases Retiradas",null,0,Replacer.ReplaceValue,{"Recuento"}),
+    #"Columnas con nombre cambiado7" = Table.RenameColumns(#"Valor reemplazado26",{{"Recuento", "Recuento_Retirado"}}),
+    #"Valor reemplazado27" = Table.ReplaceValue(#"Columnas con nombre cambiado7","CASTRO CASTAÑO GLORIA CRISTINA","GLORIA CRISTINA CASTRO CASTAÑO",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Consultas combinadas6" = Table.NestedJoin(#"Valor reemplazado27", {"Numero"}, #"GNB SUDAMERIS", {"CEDULA"}, "GNB SUDAMERIS", JoinKind.LeftOuter),
+    #"Columnas con nombre cambiado8" = Table.RenameColumns(#"Consultas combinadas6",{{"GNB SUDAMERIS", "Estado GNB Sudameris"}}),
+    #"Se expandió Estado GNB Sudameris" = Table.ExpandTableColumn(#"Columnas con nombre cambiado8", "Estado GNB Sudameris", {"PRODUCTO"}, {"Estado GNB Sudameris.PRODUCTO"}),
+    #"Columnas con nombre cambiado9" = Table.RenameColumns(#"Se expandió Estado GNB Sudameris",{{"Estado GNB Sudameris.PRODUCTO", "Estado GNB Sudameris"}}),
+    #"Columnas reordenadas1" = Table.ReorderColumns(#"Columnas con nombre cambiado9",{"No de Carta", "Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado"}),
+    #"Consultas combinadas7" = Table.NestedJoin(#"Columnas reordenadas1", {"Numero"}, AUTORIZADOS_POPULAR, {"CEDULA"}, "BANCO POPULAR", JoinKind.LeftOuter),
+    #"Se expandió BANCO POPULAR" = Table.ExpandTableColumn(#"Consultas combinadas7", "BANCO POPULAR", {"CEDULA"}, {"BANCO POPULAR.CEDULA"}),
+    #"Personalizada agregada" = Table.AddColumn(#"Se expandió BANCO POPULAR", "Estado BANCO POPULAR", each if [BANCO POPULAR.CEDULA] = null then null else "BANCO POPULAR"),
+    #"Columnas reordenadas2" = Table.ReorderColumns(#"Personalizada agregada",{"No de Carta", "Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "BANCO POPULAR.CEDULA"}),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Columnas reordenadas2",{"BANCO POPULAR.CEDULA"}),
+    #"Valor reemplazado28" = Table.ReplaceValue(#"Columnas quitadas","CALI N1","CALI_NODO BANFINANCO SAS",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado29" = Table.ReplaceValue(#"Valor reemplazado28","NODO PROJECKTAR","BOGOTA_NODO PROJEKTAR SAS",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado30" = Table.ReplaceValue(#"Valor reemplazado29","BOGOTA_NODO PROJEKTAR SAS","BOGOTA_ASESOR ELITE ESPECIAL_RICARDO ANTONIO ESGUERRA GARCIA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado25" = Table.ReplaceValue(#"Valor reemplazado30","AGENTE EXCLUSIVO ELITE","AGENTE EXCLUSIVO_ELITE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado31" = Table.ReplaceValue(#"Valor reemplazado25","BOGOTA_NODO MULTIBANKA SAS","MULTIBANKA 1",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado32" = Table.ReplaceValue(#"Valor reemplazado31","BOGOTA_NODO MULTIBANKA","MULTIBANKA 1",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado33" = Table.ReplaceValue(#"Valor reemplazado32","MULTIBANKA 2","MULTIBANKA 1",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado34" = Table.ReplaceValue(#"Valor reemplazado33","MULTIBANKA","MULTIBANKA 1",Replacer.ReplaceValue,{"Oficina"}),
+    #"Columna condicional agregada" = Table.AddColumn(#"Valor reemplazado34", "PESO ESTADO", each if [Estado] = "ACTIVO" then 0 else if [Estado] = "Vinculacion pendiente" then 1 else 3),
+    #"Filas ordenadas2" = Table.Buffer(Table.Sort(#"Columna condicional agregada",{{"PESO ESTADO", Order.Ascending}, {"Fecha de Retiro", Order.Descending}})),
+    #"Duplicados quitados" = Table.Distinct(#"Filas ordenadas2", {"Numero"}),
+    #"Texto recortado3" = Table.TransformColumns(#"Duplicados quitados",{{"Cargo", Text.Trim, type text}}),
+    #"Columna duplicada" = Table.DuplicateColumn(#"Texto recortado3", "Numero", "Numero - Copia"),
+    #"OJO ASESORES ELITE ESPECIAL" = Table.AddColumn(#"Columna duplicada", "Ofi", each if [Nombre Completo]="MARGARITA MOLINA ROJAS" and [Cargo]="ASESOR ELITE ESPECIAL" then "BOGOTA_ASESOR ELITE ESPECIAL_MARGARITA MOLINA ROJAS" 
+demás 
+if [Nombre Completo]="LUZ ADRIANA PINO ALZATE" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "CALI_ASESOR ELITE ESPECIAL_LUZ ADRIANA PINO ALZATE" 
+demás
+if [Nombre Completo]="JAIME ANDRES CAICEDO GUZMAN" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JAIME ANDRES CAICEDO GUZMAN"
+demás 
+si [Nombre Completo]="LEONARDO JIMENEZ" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "CUCUTA_ASESOR ELITE ESPECIAL_LEONARDO JIMENEZ"
+demás
+if [Nombre Completo]="RICARDO ANTONIO ESGUERRA GARCIA" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_RICARDO ANTONIO ESGUERRA GARCIA"
+demás
+if [Nombre Completo]="JOSE GUILLERMO LEON BARRETO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+if [Nombre Completo]="JOAN STEVEN ACEROS VESGA" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_JOAN STEVEN ACEROS VESGA"
+demás
+if [Nombre Completo]="MELISSA FERNANDA CAÑAS URIBE" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_MELISSA FERNANDA CAÑAS URIBE"
+demás
+if [Nombre Completo]="YESID ARLEY MARTINEZ MANCILLA" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_YESID ARLEY MARTINEZ MANCILLA"
+demás
+if [Nombre Completo]="SHIRLEY GENOVER HURTADO HURTADO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "POPAYAN_ASESOR ELITE ESPECIAL_SHIRLEY GENOVER HURTADO HURTADO"
+demás
+if [Nombre Completo]="CARLOS AUGUSTO JACOME ALVAREZ" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+if [Nombre Completo]="LUIS EUGENIO BOTERO JARAMILLO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "BOGOTA_ASESOR ELITE ESPECIAL_LUIS EUGENIO BOTERO JARAMILLO"
+demás
+if [Nombre Completo]="ANGIE PAOLA MENDOZA TRUJILLO" y [Cargo]="ASESOR ELITE ESPECIAL" entonces "CARTAGENA_ASESOR ELITE ESPECIAL_ANGIE PAOLA MENDOZA TRUJILLO"
+demás
+
+//
+
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "MARGARITA MOLINA ROJAS" entonces "BOGOTA_ASESOR ELITE ESPECIAL_MARGARITA MOLINA ROJAS" 
+demás 
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "LUZ ADRIANA PINO ALZATE" entonces "CALI_ASESOR ELITE ESPECIAL_LUZ ADRIANA PINO ALZATE" 
+demás 
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "JAIME ANDRES CAICEDO GUZMAN" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JAIME ANDRES CAICEDO GUZMAN" 
+demás
+si [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "LEONARDO JIMENEZ" entonces "CUCUTA_ASESOR ELITE ESPECIAL_LEONARDO JIMENEZ"
+demás
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "RICARDO ANTONIO ESGUERRA GARCIA" entonces "BOGOTA_ASESOR ELITE ESPECIAL_RICARDO ANTONIO ESGUERRA GARCIA"
+demás
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "JOSE GUILLERMO LEON BARRETO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "JOAN STEVEN ACEROS VESGA" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_JOAN STEVEN ACEROS VESGA"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "MELISSA FERNANDA CAÑAS URIBE" entonces "BUCARAMANGA_ASESOR ELITE ESPECIAL_MELISSA FERNANDA CAÑAS URIBE"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "YESID ARLEY MARTINEZ MANCILLA" entonces "BOGOTA_ASESOR ELITE ESPECIAL_YESID ARLEY MARTINEZ MANCILLA"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "SHIRLEY GENOVER HURTADO HURTADO" entonces "POPAYAN_ASESOR ELITE ESPECIAL_SHIRLEY GENOVER HURTADO HURTADO"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "CARLOS AUGUSTO JACOME ALVAREZ" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO" y [Nombre Jefe Directo]= "CARLOS AUGUSTO JACOME ALVAREZ" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO_ELITE" y [Nombre Jefe Directo]= "CARLOS AUGUSTO JACOME ALVAREZ" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+
+if [Cargo]= "ASESOR FREE LANCE_ELITE" y [Nombre Jefe Directo]= "JORGE RAFAEL NATERA CONSUEGRA" entonces "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ"
+demás
+if [Cargo]= "ASESOR FREE LANCE ELITE ESPECIAL" y [Nombre Jefe Directo]= "LUIS EUGENIO BOTERO JARAMILLO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_LUIS EUGENIO BOTERO JARAMILLO"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO" y [Nombre Jefe Directo]= "JOSE GUILLERMO LEON BARRETO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+si [Cargo]= "AGENTE EXCLUSIVO_ELITE" y [Nombre Jefe Directo]= "JOSE GUILLERMO LEON BARRETO" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+si [Cargo]= "ASESOR FREE LANCE_ELITE" y [Nombre Jefe Directo]= "JOSE REINALDO RODRIGUEZ SALDAÑA" entonces "BOGOTA_ASESOR ELITE ESPECIAL_JOSE GUILLERMO LEON BARRETO"
+demás
+if [Cargo]= "ASESOR FREE LANCE_ELITE" y [Nombre Jefe Directo]= "ANGIE PAOLA MENDOZA TRUJILLO" entonces "CARTAGENA_ASESOR ELITE ESPECIAL_ANGIE PAOLA MENDOZA TRUJILLO"
+demás
+
+[Oficina]),
+    #"Columnas quitadas1" = Table.RemoveColumns(#"OJO ASESORES ELITE ESPECIAL",{"Oficina"}),
+    #"Columnas con nombre cambiado10" = Table.RenameColumns(#"Columnas quitadas1",{{"Ofi", "Oficina"}}),
+    #"Columnas reordenadas3" = Table.ReorderColumns(#"Columnas con nombre cambiado10",{"No de Carta", "Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Fecha Contrato Vantage", "Retiro Contrato Vantage", "Contrato Colfinactiva", "Fecha Contrato Colfinactiva", "Estado Onest", "Retiro Contrato Colfinactiva", "Contrato Onest", "Fecha Contrato Onest", "Retiro Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "PESO ESTADO", "Numero - Copia"}),
+    #"EQUIPOS AGENTE EXCLUSIVO ELITE" = Table.AddColumn(#"Columnas reordenadas3", "EQUIPO AGENTE EXCLUSIVO ELITE", cada una if [Cargo] = "AGENTE EXCLUSIVO_ELITE" then [Oficina] & "_" & "AGENTE EXCLUSIVO ELITE" & "_" & [Nombre Completo]
+
+demás
+
+if [Cargo] = "ASESOR FREE LANCE_ELITE" then [Oficina] & "_" & "AGENTE EXCLUSIVO ELITE" & "_" & [Nombre Jefe Directo]
+
+demás
+
+if [Cargo] = "AGENTE EXCLUSIVO ELITE GOLD" then [Oficina] & "_" & "AGENTE EXCLUSIVO ELITE GOLD" & "_" & [Nombre Completo]
+
+demás
+
+if [Cargo] = "ASESOR FREE LANCE_ELITE GOLD" then [Oficina] & "_" & "AGENTE EXCLUSIVO ELITE GOLD" & "_" & [Nombre Jefe Directo]
+
+demás
+
+nulo),
+    #"Valor reemplazado35" = Table.ReplaceValue(#"EQUIPOS AGENTE EXCLUSIVO ELITE","MEDELLIN_CARLOS ALFREDO LICONA DE LA ROSA","MEDELLIN_NODO CARLOS ALFREDO LICONA DE LA ROSA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Consultas combinadas8" = Table.NestedJoin(#"Valor reemplazado35", {"Numero"}, #"Banco_Occidente (2)", {"CEDULA"}, "Banco_Occidente (2)", JoinKind.LeftOuter),
+    #"Se expandió Banco_Occidente (2)" = Table.ExpandTableColumn(#"Consultas combinadas8", "Banco_Occidente (2)", {"PRODUCTO"}, {"Banco_Occidente (2).PRODUCTO"}),
+    #"Columnas con nombre cambiado11" = Table.RenameColumns(#"Se expandió Banco_Occidente (2)",{{"Banco_Occidente (2).PRODUCTO", "ESTADO OCCIDENTE"}}),
+    #"Consultas combinadas9" = Table.NestedJoin(#"Columnas con nombre cambiado11", {"Cargo"}, CORRECCION_ASESORES_GENERAL, {"TIPO ASESOR ERROR"}, "CORRECCION_ASESORES_GENERAL", JoinKind.LeftOuter),
+    #"Se expandió CORRECCION_ASESORES_GENERAL" = Table.ExpandTableColumn(#"Consultas combinadas9", "CORRECCION_ASESORES_GENERAL", {"TIPO ASESOR CORREGIDO"}, {"CORRECCION_ASESORES_GENERAL.TIPO ASESOR CORREGIDO"}),
+    #"Columnas reordenadas4" = Table.ReorderColumns(#"Se expandió CORRECCION_ASESORES_GENERAL",{"No de Carta", "Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "CORRECCION_ASESORES_GENERAL.TIPO ASESOR CORREGIDO", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato" Vantage", "Fecha Contrato Vantage", "Retiro Contrato Vantage", "Contrato Colfinactiva", "Fecha Contrato Colfinactiva", "Estado Onest", "Retiro Contrato Colfinactiva", "Contrato Onest", "Fecha Contrato Onest", "Retiro Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "PESO ESTADO", "Numero - Copia", "EQUIPO AGENTE EXCLUSIVO ELITE", "ESTADO OCCIDENTE"}),
+    #"Columnas quitadas2" = Table.RemoveColumns(#"Columnas reordenadas4",{"Cargo"}),
+    #"Columnas con nombre cambiado12" = Table.RenameColumns(#"Columnas quitadas2",{{"CORRECCION_ASESORES_GENERAL.TIPO ASESOR CORREGIDO", "Cargo"}})
+en
+    #"Columnas con nombre cambiado12"
+    // CONSOLIDADO BASES ACTIVOS 
+    y
+    Origen = Table.Combine({#"Planta (2)", #"Free (2)", ADICIONAL}),
+    #"Filas ordenadas" = Table.Sort(Origen,{{"Estado", Order.Ascending}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas ordenadas",{"Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "ESTADO FILTRO"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Otras columnas quitadas","Á","A",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","É","E",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Í","I",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Ó","O",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Ú","U",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado4","BOGOTACALLE94","BOGOTA",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","BOGOTA/CARTAGENA","BOGOTA",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7","SANTAMARTA","SANTA MARTA",Replacer.ReplaceText,{"Oficina"}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Valor reemplazado8",{"Numero"},#"Colpatria (2)",{"CEDULA"},"Colpatria",JoinKind.LeftOuter),
+    #"Se expandió Colpatria" = Table.ExpandTableColumn(#"Consultas combinadas", "Colpatria", {"PRODUCTO"}, {"Colpatria.PRODUCTO"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió Colpatria",{{"Colpatria.PRODUCTO", "Estado Colpatria"}}),
+    #"Consultas combinadas1" = Table.NestedJoin(#"Columnas con nombre cambiado",{"Numero"},#"Av_Villas (2)",{"CEDULA"},"Av_Villas",JoinKind.LeftOuter),
+    #"Se expandió Av_Villas" = Table.ExpandTableColumn(#"Consultas combinadas1", "Av_Villas", {"PRODUCTO"}, {"Av_Villas.PRODUCTO"}),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Se expandió Av_Villas",{{"Av_Villas.PRODUCTO", "Estado Av Villas"}}),
+    #"Consultas combinadas2" = Table.NestedJoin(#"Columnas con nombre cambiado1",{"Numero"},#"Bayport (2)",{"CEDULA"},"Bayport",JoinKind.LeftOuter),
+    #"Se expandió Bayport" = Table.ExpandTableColumn(#"Consultas combinadas2", "Bayport", {"PRODUCTO"}, {"Bayport.PRODUCTO"}),
+    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Se expandió Bayport",{{"Bayport.PRODUCTO", "Estado Bayport"}}),
+    #"Consultas combinadas3" = Table.NestedJoin(#"Columnas con nombre cambiado2",{"Numero"},#"CSC (2)",{"CEDULA"},"CSC",JoinKind.LeftOuter),
+    #"Se expandió CSC" = Table.ExpandTableColumn(#"Consultas combinadas3", "CSC", {"PRODUCTO"}, {"CSC.PRODUCTO"}),
+    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Se expandió CSC",{{"CSC.PRODUCTO", "Estado CSC"}}),
+    #"Valor reemplazado9" = Table.ReplaceValue(#"Columnas con nombre cambiado3","JOHN MAYKOL CÁRDENAS HOYOS","JOHN MAYKOL CARDENAS HOYOS",Replacer.ReplaceText,{"Nombre Jefe Directo"}),
+    #"Filas filtradas" = Table.SelectRows(#"Valor reemplazado9", each ([Numero] <> null)),
+    #"Valor reemplazado10" = Table.ReplaceValue(#"Filas filtradas","Retiro","RETIRADO",Replacer.ReplaceText,{"Estado"}),
+    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado10","Activo","ACTIVO",Replacer.ReplaceText,{"Estado"}),
+    #"Valor reemplazado12" = Table.ReplaceValue(#"Valor reemplazado11"," "," ",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Texto recortado" = Table.TransformColumns(#"Valor reemplazado12",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Valor reemplazado13" = Table.ReplaceValue(#"Texto recortado","-SFI","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado14" = Table.ReplaceValue(#"Valor reemplazado13","LINA MARÍA GARCÍA RUIZ","LINA MARIA GARCIA RUIZ",Replacer.ReplaceValue,{"Nombre Jefe Directo"}),
+    #"Valor reemplazado15" = Table.ReplaceValue(#"Valor reemplazado14"," "," ",Replacer.ReplaceText,{"Nombre Jefe Directo"}),
+    #"Texto recortado1" = Table.TransformColumns(#"Valor reemplazado15",{{"Nombre Jefe Directo", Text.Trim, type text}}),
+    #"Valor reemplazado16" = Table.ReplaceValue(#"Texto recortado1","JOHANA LEON","JOHANA MILENA LEON SUDEA",Replacer.ReplaceValue,{"Nombre Jefe Directo"}),
+    #"Valor reemplazado17" = Table.ReplaceValue(#"Valor reemplazado16","-PROFINZNAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado18" = Table.ReplaceValue(#"Valor reemplazado17","-PROFINANZAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado19" = Table.ReplaceValue(#"Valor reemplazado18","PROFINANZAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Texto recortado2" = Table.TransformColumns(#"Valor reemplazado19",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Valor reemplazado20" = Table.ReplaceValue(#"Texto recortado2","RAFAEL#(00A0)ENRIQUE GUERRERO CONTRERAS","RAFAEL ENRIQUE GUERRERO CONTRERAS",Replacer.ReplaceValue,{"Nombre Completo"}),
+    #"Valor reemplazado21" = Table.ReplaceValue(#"Valor reemplazado20","DIRECTOR ENCARGADO OFICINA ARMENIA","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado22" = Table.ReplaceValue(#"Valor reemplazado21","DIRECTOR DE OFICINA_FREE","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado23" = Table.ReplaceValue(#"Valor reemplazado22","DIRECTOR DE OFICINA SINCELEJO Y MONTERIA","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Poner en mayúsculas cada palabra insertada" = Table.AddColumn(#"Valor reemplazado23", "Poner En Mayúsculas Cada Palabra", each Text.Proper([Nombre Completo]), type text),
+    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Poner en mayúsculas cada palabra insertada",{{"Poner En Mayúsculas Cada Palabra", "Nombre Completo - Copia"}}),
+    #"Filas ordenadas1" = Table.Sort(#"Columnas con nombre cambiado4",{{"Oficina", Order.Ascending}}),
+    #"Índice agregado" = Table.AddIndexColumn(#"Filas ordenadas1", "Índice", 1, 1),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Índice agregado",{"Índice", "Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Nombre Completo - Copia"}),
+    #"Columnas con nombre cambiado5" = Table.RenameColumns(#"Columnas reordenadas",{{"Índice", "No de Carta"}}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Columnas con nombre cambiado5","BOGOTA CALLE 94","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado24" = Table.ReplaceValue(#"Valor reemplazado5","BOGOTA CALLE 94/CARTAGENA","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado25" = Table.ReplaceValue(#"Valor reemplazado24","BOGOTA 1","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Filas ordenadasFECHA INGRESO" = Table.Sort(#"Valor reemplazado25",{{"Fecha de Ingreso", Order.Descending}}),
+    #"Filas filtradas1" = Table.SelectRows(#"Filas ordenadasFECHA INGRESO", each ([Estado] <> "RETIRADO")),
+    #"Duplicados quitados" = Table.Distinct(#"Filas filtradas1", {"Numero"}),
+    #"Filas agrupadas" = Table.Group(#"Duplicados quitados", {"Numero"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+en
+    #"Filas agrupadas"
+    //bases consolidadas retiradas
+    dejar
+    Origen = Tabla.Combinar({#"Planta (2)", #"Libre (2)"}),
+    #"Filas ordenadas" = Table.Sort(Origen,{{"Estado", Order.Ascending}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas ordenadas",{"Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "ESTADO FILTRO"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Otras columnas quitadas","Á","A",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","É","E",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","Í","I",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","Ó","O",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Valor reemplazado3","Ú","U",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado4","BOGOTACALLE94","BOGOTA",Replacer.ReplaceText,{"Oficina","Nombre Jefe Directo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","BOGOTA/CARTAGENA","BOGOTA",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7","SANTAMARTA","SANTA MARTA",Replacer.ReplaceText,{"Oficina"}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Valor reemplazado8",{"Numero"},#"Colpatria (2)",{"CEDULA"},"Colpatria",JoinKind.LeftOuter),
+    #"Se expandió Colpatria" = Table.ExpandTableColumn(#"Consultas combinadas", "Colpatria", {"PRODUCTO"}, {"Colpatria.PRODUCTO"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Se expandió Colpatria",{{"Colpatria.PRODUCTO", "Estado Colpatria"}}),
+    #"Consultas combinadas1" = Table.NestedJoin(#"Columnas con nombre cambiado",{"Numero"},#"Av_Villas (2)",{"CEDULA"},"Av_Villas",JoinKind.LeftOuter),
+    #"Se expandió Av_Villas" = Table.ExpandTableColumn(#"Consultas combinadas1", "Av_Villas", {"PRODUCTO"}, {"Av_Villas.PRODUCTO"}),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Se expandió Av_Villas",{{"Av_Villas.PRODUCTO", "Estado Av Villas"}}),
+    #"Consultas combinadas2" = Table.NestedJoin(#"Columnas con nombre cambiado1",{"Numero"},#"Bayport (2)",{"CEDULA"},"Bayport",JoinKind.LeftOuter),
+    #"Se expandió Bayport" = Table.ExpandTableColumn(#"Consultas combinadas2", "Bayport", {"PRODUCTO"}, {"Bayport.PRODUCTO"}),
+    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Se expandió Bayport",{{"Bayport.PRODUCTO", "Estado Bayport"}}),
+    #"Consultas combinadas3" = Table.NestedJoin(#"Columnas con nombre cambiado2",{"Numero"},#"CSC (2)",{"CEDULA"},"CSC",JoinKind.LeftOuter),
+    #"Se expandió CSC" = Table.ExpandTableColumn(#"Consultas combinadas3", "CSC", {"PRODUCTO"}, {"CSC.PRODUCTO"}),
+    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Se expandió CSC",{{"CSC.PRODUCTO", "Estado CSC"}}),
+    #"Valor reemplazado9" = Table.ReplaceValue(#"Columnas con nombre cambiado3","JOHN MAYKOL CÁRDENAS HOYOS","JOHN MAYKOL CARDENAS HOYOS",Replacer.ReplaceText,{"Nombre Jefe Directo"}),
+    #"Filas filtradas" = Table.SelectRows(#"Valor reemplazado9", each ([Numero] <> null)),
+    #"Valor reemplazado10" = Table.ReplaceValue(#"Filas filtradas","Retiro","RETIRADO",Replacer.ReplaceText,{"Estado"}),
+    #"Valor reemplazado11" = Table.ReplaceValue(#"Valor reemplazado10","Activo","ACTIVO",Replacer.ReplaceText,{"Estado"}),
+    #"Valor reemplazado12" = Table.ReplaceValue(#"Valor reemplazado11"," "," ",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Texto recortado" = Table.TransformColumns(#"Valor reemplazado12",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Valor reemplazado13" = Table.ReplaceValue(#"Texto recortado","-SFI","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado14" = Table.ReplaceValue(#"Valor reemplazado13","LINA MARÍA GARCÍA RUIZ","LINA MARIA GARCIA RUIZ",Replacer.ReplaceValue,{"Nombre Jefe Directo"}),
+    #"Valor reemplazado15" = Table.ReplaceValue(#"Valor reemplazado14"," "," ",Replacer.ReplaceText,{"Nombre Jefe Directo"}),
+    #"Texto recortado1" = Table.TransformColumns(#"Valor reemplazado15",{{"Nombre Jefe Directo", Text.Trim, type text}}),
+    #"Valor reemplazado16" = Table.ReplaceValue(#"Texto recortado1","JOHANA LEON","JOHANA MILENA LEON SUDEA",Replacer.ReplaceValue,{"Nombre Jefe Directo"}),
+    #"Valor reemplazado17" = Table.ReplaceValue(#"Valor reemplazado16","-PROFINZNAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado18" = Table.ReplaceValue(#"Valor reemplazado17","-PROFINANZAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Valor reemplazado19" = Table.ReplaceValue(#"Valor reemplazado18","PROFINANZAS","",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Texto recortado2" = Table.TransformColumns(#"Valor reemplazado19",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Valor reemplazado20" = Table.ReplaceValue(#"Texto recortado2","RAFAEL#(00A0)ENRIQUE GUERRERO CONTRERAS","RAFAEL ENRIQUE GUERRERO CONTRERAS",Replacer.ReplaceValue,{"Nombre Completo"}),
+    #"Valor reemplazado21" = Table.ReplaceValue(#"Valor reemplazado20","DIRECTOR ENCARGADO OFICINA ARMENIA","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado22" = Table.ReplaceValue(#"Valor reemplazado21","DIRECTOR DE OFICINA_FREE","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado23" = Table.ReplaceValue(#"Valor reemplazado22","DIRECTOR DE OFICINA SINCELEJO Y MONTERIA","DIRECTOR DE OFICINA",Replacer.ReplaceValue,{"Cargo"}),
+    #"Poner en mayúsculas cada palabra insertada" = Table.AddColumn(#"Valor reemplazado23", "Poner En Mayúsculas Cada Palabra", each Text.Proper([Nombre Completo]), type text),
+    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Poner en mayúsculas cada palabra insertada",{{"Poner En Mayúsculas Cada Palabra", "Nombre Completo - Copia"}}),
+    #"Filas ordenadas1" = Table.Sort(#"Columnas con nombre cambiado4",{{"Oficina", Order.Ascending}}),
+    #"Índice agregado" = Table.AddIndexColumn(#"Filas ordenadas1", "Índice", 1, 1),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Índice agregado",{"Índice", "Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Fecha de Ingreso", "Tipo de Contrato", "Dashboard", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Nombre Completo - Copia"}),
+    #"Columnas con nombre cambiado5" = Table.RenameColumns(#"Columnas reordenadas",{{"Índice", "No de Carta"}}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Columnas con nombre cambiado5","BOGOTA CALLE 94","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado24" = Table.ReplaceValue(#"Valor reemplazado5","BOGOTA CALLE 94/CARTAGENA","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado25" = Table.ReplaceValue(#"Valor reemplazado24","BOGOTA 1","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Filas ordenadasFECHA INGRESO" = Table.Sort(#"Valor reemplazado25",{{"Fecha de Ingreso", Order.Descending}}),
+    #"Filas filtradas1" = Table.SelectRows(#"Filas ordenadasFECHA INGRESO", each ([Estado] = "RETIRADO")),
+    #"Consultas combinadas4" = Table.NestedJoin(#"Filas filtradas1", {"Numero"}, #"Consolidado Bases Activos", {"Numero"}, "Consolidado Bases Activos", JoinKind.LeftOuter),
+    #"Se expandió Consolidado Bases Activos" = Table.ExpandTableColumn(#"Consultas combinadas4", "Consolidado Bases Activos", {"Numero"}, {"Consolidado Bases Activos.Numero"}),
+    #"FILTRO SACO POSIBLES ACTIVOS" = Table.SelectRows(#"Se expandió Consolidado Bases Activos", each ([Consolidado Bases Activos.Numero] = null)),
+    #"Duplicados quitados" = Table.Distinct(#"FILTRO SACO POSIBLES ACTIVOS", {"Numero"}),
+    #"Filas agrupadas" = Table.Group(#"Duplicados quitados", {"Numero"}, {{"Recuento", each Table.RowCount(_), Int64.Type}})
+en
+    #"Filas agrupadas"
+  
+    //CONSOLIDADA GRATIS
+    dejar
+    Origen = Table.Combine({#"GRATIS RETIRADOS", #"GRATIS ACTIVOS"})
+en
+    Origen
+    // FRRE_2
+    dejar
+    Origen = #"GRATIS CONSOLIDADA",
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"#", Int64.Type}, {"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", escriba cualquiera}, {"Área", escriba texto}, {"Subárea", escriba cualquiera}, {"Carga", escriba texto},{"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la Compañía", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba cualquiera}, {"Periodo de Prueba ", escriba cualquiera}, {"Fecha de Inicio", escriba cualquiera}, {"Fecha de Finalización", escriba cualquiera}, {"DIas PP", escriba cualquiera}, {"Fecha Inicio Etapa Productiva", escriba cualquier}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba fecha}, {"Modalidad del Retiro", escriba texto}, {"Motivo del Retiro", escriba texto}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba cualquier}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Teléfono Fijo", escriba cualquiera}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", escriba cualquiera}, {"Correo Electronico Personal", escriba texto}, {"Correo Electrónico Personal 2", escriba cualquiera}, {"EPS", escriba texto}, {"Afiliación", escriba cualquiera}, {"AFP", escriba texto}, {"Numero de Cuenta", escriba cualquiera}, {"Tipo de Cuenta", escriba cualquiera}, {"Banco", escriba cualquiera}, {"Empresa", escriba cualquiera}, {"Escolaridad", escriba cualquiera}, {"Titulo Escolaridad", escriba cualquiera}, {"Caso de Emergencia", escriba cualquiera}, {"Teléfono Contacto", escriba any}, {"Estado Civil", escriba cualquiera}, {"Nombre del Conyuge", escriba cualquiera}, {"Tipo de Documento", escriba cualquiera}, {"Numero4", escriba cualquiera}, {"Fecha de Nacimiento5", escriba cualquiera}, {"Hijo 1", escriba cualquiera}, {"Tipo de Documento6", escriba cualquiera}, {"Numero7", escriba cualquiera}, {"Fecha de Nacimiento8", escriba cualquiera}, {"Hijo 2", escriba cualquiera}, {"Tipo de Documento9", escriba cualquiera}, {"Numero10", escriba cualquiera}, {"Fecha de Nacimiento11", escriba cualquiera}, {"Hijo 3", escriba cualquiera}, {"Tipo de Documento12", escriba cualquiera}, {"Numero13", escriba cualquiera}, {"Fecha de Nacimiento14", escriba cualquiera}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera}, {"Fecha de Nacimiento17", escriba cualquiera}, {"Hijo 5",type any}, {"Tipo de Documento18", type any}, {"Numero19", type any}, {"Fecha de Nacimiento20", type any}, {"Fecha Actualizado", type any}, {"Fuero", type any}, {"Fecha Inicio Licencia", type any}, {"Fecha Final Licencia", type any}, {"Lactancia", type any}, {"Codigo CC", type any}, {"Descripcion CC", type any}, {"Estado", escriba texto}, {"Contrato Vantage", escriba texto}, {"Contrato Colfinactiva", escriba texto}, {"ADICIONAL DUPLICADO", escriba cualquiera}, {"ESTADO FILTRO", escriba texto}, {"Fecha Contrato Onest", escriba fechahora}}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Tipo cambiado","DIRECTOR DE OFICINA","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","DIRECTOR DE OFICINA ","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","DIRECTOR DE OFICINA BOGOTÁ 1","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Filas filtradas" = Table.SelectRows(#"Valor reemplazado7", each ([Cargo] <> "ASESOR COMERCIAL-FREE LANCE")),
+    #"Filas ordenadas" = Table.Sort(#"Filas filtradas",{{"Estado", Order.Ascending}}),
+    #"Texto recortado" = Table.TransformColumns(#"Filas ordenadas",{{"Oficina", Text.Trim, type text}}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Texto recortado","PROFINANZAS",null,Replacer.ReplaceValue,{"Correo Electronico Personal"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","JUAN GABRIEL MORA RAMIEZ","JUAN GABRIEL MORA RAMIREZ",Replacer.ReplaceText,{"Nombre Completo"})
+en
+    #"Valor reemplazado3"
+    
+    // PLANTA CONSOLIDADA 
+
+    dejar
+    Origen = Table.Combine({#"Planta RETIRADO", #"Planta ACTIVOS"})
+en
+    Origen
+
+    //PLANTA _2
+    dejar
+    Origen = #"PLANTA CONSOLIDADA",
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", type any}, {"Area", type texto}, {"Subárea", escriba texto}, {"Carga", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba texto}, {"Periodo de Prueba", escriba texto}, {"Fecha de Inicio", escriba fecha}, {"Fecha de Finalizacion", escriba fecha}, {"Dias PP", escriba text}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba cualquiera}, {"Modalidad del Retiro", escriba cualquiera}, {"Motivo del Retiro", escriba cualquiera}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba text}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escriba cualquiera}, {"Correo Electronico Corporativo", escriba cualquiera}, {"Fecha de Ultimo Aumento", escriba fecha}, {"Salario Anterior en Básico ", Int64.Type}, {"Regimen", escriba texto}, {"Salario Básico", Int64.Type}, {"Auxilio de Transporte", Int64.Type}, {"Auxilio de Vivienda", Int64.Type}, {"Auxilio de Movilizacion", Int64.Type}, {"Auxilio de Comunicacion", Int64.Type}, {"Bonos", Int64.Type}, {"Total Devengado", Int64.Type}, {"EPS", escriba texto}, {"Afiliacion", escriba texto}, {"AFP", escriba texto}, {"Afiliacion2", escriba texto}, {"CCF", escriba texto}, {"Afiliacion3", escriba texto}, {"CES", escriba texto}, {"Numero de Cuenta", Int64.Type}, {"Tipo de Cuenta", escriba texto}, {"Banco", escriba texto}, {"Empresa", escriba texto}, {"Escolaridad", escriba texto}, {"Titulo Escolaridad", escriba texto}, {"Caso de Emergencia", escriba cualquiera}, {"Teléfono Contacto", escriba cualquiera}, {"Estado Civil", escriba texto}, {"Nombre del Conyuge", escriba texto}, {"Tipo de Documento", escriba texto}, {"Numero4", Int64.Type}, {"Fecha de Nacimiento5", escriba fecha}, {"Hijo 1", escriba texto}, {"Tipo de Documento6",escriba texto}, {"Numero7", Int64.Type}, {"Fecha de Nacimiento8", escriba fecha}, {"Hijo 2", escriba texto}, {"Tipo de Documento9", escriba texto}, {"Numero10", Int64.Type}, {"Fecha de Nacimiento11", escriba fecha}, {"Hijo 3", escriba texto}, {"Tipo de Documento12", escriba texto}, {"Numero13", Int64.Type}, {"Fecha de Nacimiento14", escriba fecha}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera}, {"Fecha de Nacimiento17", escriba cualquiera}, {"Hijo 5", escriba cualquiera}, {"Tipo de Documento18", escriba cualquiera}, {"Numero19", escriba cualquiera}, {"Fecha de Nacimiento20", escriba cualquiera}, {"Fecha Actualizado", escriba fecha}, {"Fuero", escriba cualquiera}, {"Fecha Inicio Licencia", escriba cualquiera}, {"Fecha Final Licencia", escriba cualquiera}, {"Lactancia", escriba cualquiera}, {"Codigo CC", Int64.Type}, {"Descripcion CC", escriba texto}, {"Estado", escriba texto}, {"ADICIONAL DUPLICADO", escriba cualquiera}, {"ESTADO FILTRO", escriba texto}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado","CALI 1","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","CALI 2","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","BOGOTA 1","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","BOGOTÁ","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Texto recortado" = Table.TransformColumns(#"Valor reemplazado3",{{"Oficina", Text.Trim, type text}})
+en
+    #"Texto recortado"
+    // OJO ARCHIVOS PARA MODIFICAR _ ACTIVOS GRATIS 
+    dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\Plantilla General.xlsx"), null, true),
+    Tabla_Libre = Origen{[Ítem="Libre",Tipo="Tabla"]}[Datos],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Free_Table,{{"#", Int64.Type}, {"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", escriba cualquiera}, {"Área", escriba texto}, {"Subárea", escriba cualquiera}, {"Carga", escriba texto}, {"Genero ", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba cualquiera}, {"Periodo de Prueba ", escriba cualquiera}, {"Fecha de Inicio", escriba cualquiera}, {"Fecha de Finalizacion", escriba cualquiera}, {"DIas PP", escriba cualquiera}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba fecha}, {"Modalidad del Retiro", escriba texto}, {"Motivo del Retiro", escriba texto}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba cualquiera}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Teléfono Fijo", escriba cualquiera}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", escriba cualquiera}, {"Correo Electrónico Personal", escriba texto}, {"Correo Electronico Personal 2", escriba cualquiera}, {"EPS", escriba cualquiera}, {"Afiliacion", escriba cualquiera}, {"AFP", escriba cualquiera}, {"Numero de Cuenta", escriba cualquiera}, {"Tipo de Cuenta", escriba cualquiera}, {"Banco", escriba cualquiera}, {"Empresa", escriba cualquiera}, {"Escolaridad", escriba cualquiera}, {"Titulo Escolaridad", escriba cualquiera}, {"Caso de Emergencia", escriba any}, {"Telefono Contacto", type any}, {"Estado Civil", type any}, {"Nombre del Conyuge", type any}, {"Tipo de Documento", type any}, {"Numero4", type any}, {"Fecha de Nacimiento5", type any}, {"Hijo 1", type any}, {"Tipo de Documento6", type any}, {"Numero7", type any}, {"Fecha de Nacimiento8", type cualquiera}, {"Hijo 2", escriba cualquiera}, {"Tipo de Documento9", escriba cualquiera}, {"Numero10", escriba cualquiera}, {"Fecha de Nacimiento11", escriba cualquiera}, {"Hijo 3", escriba cualquiera}, {"Tipo de Documento12", escriba cualquiera}, {"Numero13", escriba cualquiera}, {"Fecha de Nacimiento14", escriba cualquiera}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera}, {"Fecha de Nacimiento17",type any}, {"Hijo 5", type any}, {"Tipo de Documento18", type any}, {"Numero19", type any}, {"Fecha de Nacimiento20", type any}, {"Fecha Actualizado", type any}, {"Fuero", type any}, {"Fecha Inicio Licencia", type any}, {"Fecha Final Licencia", type any}, {"Lactancia", type any}, {"Codigo CC", type any}, {"Descripcion CC", escribe cualquier}, {"Estado", escribe texto}, {"Contrato Vantage", escribe texto}, {"Contrato Colfinactiva", escribe texto}, {"ADICIONAL DUPLICADO", escribe cualquiera}, {"ESTADO FILTRO", escribe texto}, {"Fecha Contrato Onest", escribe fecha y hora}}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Tipo cambiado","DIRECTOR DE OFICINA","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","DIRECTOR DE OFICINA ","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","DIRECTOR DE OFICINA BOGOTÁ 1","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Filas filtradas" = Table.SelectRows(#"Valor reemplazado7", each ([Cargo] <> "ASESOR COMERCIAL-FREE LANCE")),
+    #"Filas ordenadas" = Table.Sort(#"Filas filtradas",{{"Estado", Order.Ascending}}),
+    #"Texto recortado" = Table.TransformColumns(#"Filas ordenadas",{{"Oficina", Text.Trim, type text}}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Texto recortado","PROFINANZAS",null,Replacer.ReplaceValue,{"Correo Electronico Personal"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Valor reemplazado2",{{"Genero ", "Genero"}}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Columnas con nombre cambiado","JUAN GABRIEL MORA RAMIEZ","JUAN GABRIEL MORA RAMIREZ",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Filas filtradas1" = Table.SelectRows(#"Valor reemplazado3", each ([Estado] <> "Retiro")),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Filas filtradas1","NELLY JOHANNA ESPINIZA MENESES","NELLY JOHANNA ESPINOZA MENESES",Replacer.ReplaceValue,{"Nombre Completo"})
+en
+    #"Valor reemplazado"
+
+    // OJO ARCHIVOS PARA MODIFICAR _FREE RETIRADOS
+    dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\Plantilla General.xlsx"), null, true),
+    Tabla_Libre = Origen{[Ítem="Libre",Tipo="Tabla"]}[Datos],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Free_Table,{{"#", Int64.Type}, {"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", escriba cualquiera}, {"Área", escriba texto}, {"Subárea", escriba cualquiera}, {"Carga", escriba texto}, {"Genero ", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba cualquiera}, {"Periodo de Prueba ", escriba cualquiera}, {"Fecha de Inicio", escriba cualquiera}, {"Fecha de Finalizacion", escriba cualquiera}, {"DIas PP", escriba cualquiera}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba fecha}, {"Modalidad del Retiro", escriba texto}, {"Motivo del Retiro", escriba texto}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba cualquiera}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Teléfono Fijo", escriba cualquiera}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", escriba cualquiera}, {"Correo Electrónico Personal", escriba texto}, {"Correo Electronico Personal 2", escriba cualquiera}, {"EPS", escriba cualquiera}, {"Afiliacion", escriba cualquiera}, {"AFP", escriba cualquiera}, {"Numero de Cuenta", escriba cualquiera}, {"Tipo de Cuenta", escriba cualquiera}, {"Banco", escriba cualquiera}, {"Empresa", escriba cualquiera}, {"Escolaridad", escriba cualquiera}, {"Titulo Escolaridad", escriba cualquiera}, {"Caso de Emergencia", escriba any}, {"Telefono Contacto", type any}, {"Estado Civil", type any}, {"Nombre del Conyuge", type any}, {"Tipo de Documento", type any}, {"Numero4", type any}, {"Fecha de Nacimiento5", type any}, {"Hijo 1", type any}, {"Tipo de Documento6", type any}, {"Numero7", type any}, {"Fecha de Nacimiento8", type cualquiera}, {"Hijo 2", escriba cualquiera}, {"Tipo de Documento9", escriba cualquiera}, {"Numero10", escriba cualquiera}, {"Fecha de Nacimiento11", escriba cualquiera}, {"Hijo 3", escriba cualquiera}, {"Tipo de Documento12", escriba cualquiera}, {"Numero13", escriba cualquiera}, {"Fecha de Nacimiento14", escriba cualquiera}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera}, {"Fecha de Nacimiento17",type any}, {"Hijo 5", type any}, {"Tipo de Documento18", type any}, {"Numero19", type any}, {"Fecha de Nacimiento20", type any}, {"Fecha Actualizado", type any}, {"Fuero", type any}, {"Fecha Inicio Licencia", type any}, {"Fecha Final Licencia", type any}, {"Lactancia", type any}, {"Codigo CC", type any}, {"Descripcion CC", escribe cualquier}, {"Estado", escribe texto}, {"Contrato Vantage", escribe texto}, {"Contrato Colfinactiva", escribe texto}, {"ADICIONAL DUPLICADO", escribe cualquiera}, {"ESTADO FILTRO", escribe texto}, {"Fecha Contrato Onest", escribe fecha y hora}}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Tipo cambiado","DIRECTOR DE OFICINA","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado5","DIRECTOR DE OFICINA ","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Valor reemplazado6","DIRECTOR DE OFICINA BOGOTÁ 1","DIRECTOR DE OFICINA_FREE",Replacer.ReplaceValue,{"Cargo"}),
+    #"Filas filtradas" = Table.SelectRows(#"Valor reemplazado7", each ([Cargo] <> "ASESOR COMERCIAL-FREE LANCE")),
+    #"Filas ordenadas" = Table.Sort(#"Filas filtradas",{{"Estado", Order.Ascending}}),
+    #"Texto recortado" = Table.TransformColumns(#"Filas ordenadas",{{"Oficina", Text.Trim, type text}}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Texto recortado","PROFINANZAS",null,Replacer.ReplaceValue,{"Correo Electronico Personal"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Valor reemplazado2",{{"Genero ", "Genero"}}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Columnas con nombre cambiado","JUAN GABRIEL MORA RAMIEZ","JUAN GABRIEL MORA RAMIREZ",Replacer.ReplaceText,{"Nombre Completo"}),
+    #"Filas filtradas1" = Table.SelectRows(#"Valor reemplazado3", each ([Estado] = "Retiro")),
+    #"Consultas combinadas" = Table.NestedJoin(#"Filas filtradas1", {"Numero"}, #"Free ACTIVOS", {"Numero"}, "Free ACTIVOS", JoinKind.LeftOuter),
+    #"Se expandió Free ACTIVOS" = Table.ExpandTableColumn(#"Consultas combinadas", "Free ACTIVOS", {"Numero"}, {"Free ACTIVOS.Numero"}),
+    #"FILTRO SACO ASESORES ACTIVOS" = Table.SelectRows(#"Se expandió Free ACTIVOS", each ([Free ACTIVOS.Numero] = null)),
+    #"Valor reemplazado" = Table.ReplaceValue(#"FILTRO SACO ASESORES ACTIVOS","NELLY JOHANNA ESPINIZA MENESES","NELLY JOHANNA ESPINOZA MENESES",Replacer.ReplaceValue,{"Nombre Completo"})
+en
+    #"Valor reemplazado"
+
+    //OJO ARCHIVOS PARA MODIFICAR_Planta ACTIVOS 
+    dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\Plantilla General.xlsx"), null, true),
+    Planta_Table = Origen{[Item="Planta",Kind="Table"]}[Data],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Planta_Table,{{"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", type any}, {"Área", escriba texto}, {"Subárea", escriba texto}, {"Carga", escriba texto}, {"Genero", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba texto}, {"Periodo de Prueba ", escriba texto}, {"Fecha de Inicio", escriba fecha}, {"Fecha de Finalizacion", escriba fecha}, {"Dias PP", escriba texto}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba cualquiera}, {"Modalidad del Retiro", escriba cualquiera}, {"Motivo del Retiro", escriba cualquiera}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Teléfono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electrónico Personal", escriba cualquiera}, {"Correo Electronico Corporativo", escriba cualquiera}, {"Fecha de Ultimo Aumento", escriba fecha}, {"Salario Anterior en Basico ", Int64.Type}, {"Regimen", escriba texto}, {"Salario Basico", Int64.Type}, {"Auxilio de Transporte", Int64.Type}, {"Auxilio de Vivienda", Int64.Type}, {"Auxilio de Movilizacion", Int64.Type}, {"Auxilio de Comunicacion", Int64.Type}, {"Bonos", Int64.Type}, {"Total Devengado", Int64.Type}, {"EPS", escribe texto}, {"Afiliacion", escribe texto}, {"AFP", escribe texto}, {"Afiliacion2", escribe texto}, {"CCF", escribe texto}, {"Afiliacion3", escribe texto}, {"CES", escriba texto}, {"Número de Cuenta", Int64.Type}, {"Tipo de Cuenta", escriba texto}, {"Banco", escriba texto}, {"Empresa", escriba texto}, {"Escolaridad", escriba texto}, {"Titulo Escolaridad", escriba texto}, {"Caso de Emergencia", escriba cualquiera}, {"Teléfono Contacto", escriba cualquiera}, {"Estado Civil", escriba texto}, {"Nombre del Conyuge", escriba texto}, {"Tipo de Documento", escriba texto}, {"Numero4", Int64.Type}, {"Fecha de Nacimiento5", escriba fecha}, {"Hijo 1",escriba texto}, {"Tipo de Documento6", escriba texto}, {"Numero7", Int64.Type}, {"Fecha de Nacimiento8", escriba fecha}, {"Hijo 2", escriba texto}, {"Tipo de Documento9", escriba texto}, {"Numero10", Int64.Type}, {"Fecha de Nacimiento11", escriba fecha}, {"Hijo 3", escriba texto}, {"Tipo de Documento12", escriba texto}, {"Numero13", Int64.Type}, {"Fecha de Nacimiento14", escriba fecha}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera}, {"Fecha de Nacimiento17", escriba cualquiera}, {"Hijo 5", escriba cualquiera}, {"Tipo de Documento18", escriba cualquiera}, {"Numero19", escriba cualquiera}, {"Fecha de Nacimiento20", escriba cualquiera}, {"Fecha Actualizado", escriba fecha}, {"Fuero", escriba cualquiera}, {"Fecha Inicio Licencia", escriba cualquiera}, {"Fecha Final Licencia", escriba cualquiera}, {"Lactancia", escriba cualquiera}, {"Codigo CC", Int64.Type}, {"Descripcion CC", escriba texto}, {"Estado", escriba texto}, {"ADICIONAL DUPLICADO", escriba cualquiera}, {"ESTADO FILTRO", escriba texto}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado","CALI 1","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","CALI 2","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","BOGOTA 1","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","BOGOTÁ","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Texto recortado" = Table.TransformColumns(#"Valor reemplazado3",{{"Oficina", Text.Trim, type text}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Texto recortado",{{"Genero ", "Genero"}}),
+    #"FILTRO SOLO SE DEJA PLANTA ACTIVA" = Table.SelectRows(#"Columnas con nombre cambiado", each ([Estado] = "Activo"))
+en
+    #"FILTRO SOLO SE DEJA PLANTA ACTIVA"
+
+////OJO ARCHIVOS PARA MODIFICAR_ planta RETIRADO
+dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\Plantilla General.xlsx"), null, true),
+    Planta_Table = Origen{[Item="Planta",Kind="Table"]}[Data],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Planta_Table,{{"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", type any}, {"Área", escriba texto}, {"Subárea", escriba texto}, {"Carga", escriba texto}, {"Genero", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba texto}, {"Periodo de Prueba ", escriba texto}, {"Fecha de Inicio", escriba fecha}, {"Fecha de Finalizacion", escriba fecha}, {"Dias PP", escriba texto}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba cualquiera}, {"Modalidad del Retiro", escriba cualquiera}, {"Motivo del Retiro", escriba cualquiera}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Teléfono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electrónico Personal", escriba cualquiera}, {"Correo Electronico Corporativo", escriba cualquiera}, {"Fecha de Ultimo Aumento", escriba fecha}, {"Salario Anterior en Basico ", Int64.Type}, {"Regimen", escriba texto}, {"Salario Basico", Int64.Type}, {"Auxilio de Transporte", Int64.Type}, {"Auxilio de Vivienda", Int64.Type}, {"Auxilio de Movilizacion", Int64.Type}, {"Auxilio de Comunicacion", Int64.Type}, {"Bonos", Int64.Type}, {"Total Devengado", Int64.Type}, {"EPS", escribe texto}, {"Afiliacion", escribe texto}, {"AFP", escribe texto}, {"Afiliacion2", escribe texto}, {"CCF", escribe texto}, {"Afiliacion3", escribe texto}, {"CES", escriba texto}, {"Número de Cuenta", Int64.Type}, {"Tipo de Cuenta", escriba texto}, {"Banco", escriba texto}, {"Empresa", escriba texto}, {"Escolaridad", escriba texto}, {"Titulo Escolaridad", escriba texto}, {"Caso de Emergencia", escriba cualquiera}, {"Teléfono Contacto", escriba cualquiera}, {"Estado Civil", escriba texto}, {"Nombre del Conyuge", escriba texto}, {"Tipo de Documento", escriba texto}, {"Numero4", Int64.Type}, {"Fecha de Nacimiento5", escriba fecha}, {"Hijo 1",escriba texto}, {"Tipo de Documento6", escriba texto}, {"Numero7", Int64.Type}, {"Fecha de Nacimiento8", escriba fecha}, {"Hijo 2", escriba texto}, {"Tipo de Documento9", escriba texto}, {"Numero10", Int64.Type}, {"Fecha de Nacimiento11", escriba fecha}, {"Hijo 3", escriba texto}, {"Tipo de Documento12", escriba texto}, {"Numero13", Int64.Type}, {"Fecha de Nacimiento14", escriba fecha}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera}, {"Fecha de Nacimiento17", escriba cualquiera}, {"Hijo 5", escriba cualquiera}, {"Tipo de Documento18", escriba cualquiera}, {"Numero19", escriba cualquiera}, {"Fecha de Nacimiento20", escriba cualquiera}, {"Fecha Actualizado", escriba fecha}, {"Fuero", escriba cualquiera}, {"Fecha Inicio Licencia", escriba cualquiera}, {"Fecha Final Licencia", escriba cualquiera}, {"Lactancia", escriba cualquiera}, {"Codigo CC", Int64.Type}, {"Descripcion CC", escriba texto}, {"Estado", escriba texto}, {"ADICIONAL DUPLICADO", escriba cualquiera}, {"ESTADO FILTRO", escriba texto}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado","CALI 1","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","CALI 2","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Valor reemplazado1","BOGOTA 1","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","BOGOTÁ","BOGOTA",Replacer.ReplaceValue,{"Oficina"}),
+    #"Texto recortado" = Table.TransformColumns(#"Valor reemplazado3",{{"Oficina", Text.Trim, type text}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Texto recortado",{{"Genero ", "Genero"}}),
+    #"FILTRO SE SACA SOLO PLANTA RETIRADA" = Table.SelectRows(#"Columnas con nombre cambiado", each ([Estado] = "Retiro")),
+    #"Consultas combinadas" = Table.NestedJoin(#"FILTRO SE SACA SOLO PLANTA RETIRADA", {"Numero"}, #"Planta ACTIVOS", {"Numero"}, "Planta ACTIVOS", JoinKind.LeftOuter),
+    #"Se expandió Planta ACTIVOS" = Table.ExpandTableColumn(#"Consultas combinadas", "Planta ACTIVOS", {"Numero"}, {"Planta ACTIVOS.Numero"}),
+    #"Filas filtradas" = Table.SelectRows(#"Se expandió Planta ACTIVOS", each ([Planta ACTIVOS.Numero] = null))
+en
+    #"Filas filtradas"
+
+    //OJO ARCHIVOS PARA MODIFICAR_ BANCO POPULAR 
+    dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\Plantilla General.xlsx"), null, true),
+    Tabla_Libre = Origen{[Ítem="Libre",Tipo="Tabla"]}[Datos],
+    #"Tipo cambiado1" = Table.TransformColumnTypes(Free_Table,{{"#", Int64.Type}, {"Tipo", escriba texto}, {"Numero", Int64.Type}, {"Nombre Completo", escriba texto}, {"Primer Apellido", escriba texto}, {"Segundo Apellido", escriba texto}, {"Primer Nombre", escriba texto}, {"Segundo Nombre", escriba texto}, {"Entrega Carne", escriba cualquiera}, {"Área", escriba texto}, {"Subárea", escriba texto}, {"Carga", escriba texto}, {"Genero ", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba cualquiera}, {"Periodo de Prueba ", escriba cualquiera}, {"Fecha de Inicio", Int64.Type}, {"Fecha de Finalizacion", Int64.Type}, {"DIas PP", Int64.Type}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba fecha}, {"Modalidad del Retiro", escriba texto}, {"Motivo del Retiro", escriba texto}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escriba texto}, {"Correo Electronico Personal 2", Int64.Type}, {"EPS", escriba texto}, {"Afiliacion", escriba cualquiera}, {"AFP", escriba texto}, {"Numero de Cuenta", escriba cualquiera}, {"Tipo de Cuenta", escriba cualquiera}, {"Banco", escriba cualquiera}, {"Empresa", escriba cualquiera}, {"Escolaridad", escriba any}, {"Titulo Escolaridad", escriba cualquiera}, {"Caso de Emergencia", escriba cualquiera}, {"Telefono Contacto", escriba cualquiera}, {"Estado Civil", escriba cualquiera}, {"Nombre del Conyuge", escriba cualquiera}, {"Tipo de Documento", escriba cualquiera}, {"Numero4", escriba cualquiera}, {"Fecha de Nacimiento5", escriba cualquiera}, {"Hijo 1", escriba cualquiera}, {"Tipo de Documento6", escriba cualquiera}, {"Numero7", escribe cualquiera}, {"Fecha de Nacimiento8", escriba cualquiera}, {"Hijo 2", escriba cualquiera}, {"Tipo de Documento9", escriba cualquiera}, {"Numero10", escriba cualquiera}, {"Fecha de Nacimiento11", escriba cualquiera}, {"Hijo 3", escriba cualquiera}, {"Tipo de Documento12", escriba cualquiera}, {"Numero13", escriba cualquiera}, {"Fecha de Nacimiento14", escriba cualquiera}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera},{"Fecha de Nacimiento17", escriba cualquiera}, {"Hijo 5", escriba cualquiera}, {"Tipo de Documento18", escriba cualquiera}, {"Numero19", escriba cualquiera}, {"Fecha de Nacimiento20", escriba cualquiera}, {"Fecha Actualizado", escriba cualquiera}, {"Fuero", escriba cualquiera}, {"Fecha Inicio Licencia", escriba cualquiera}, {"Fecha Final Licencia", escriba cualquiera}, {"Lactancia", escriba cualquiera}, {"Codigo CC", escriba cualquiera}, {"Descripcion CC", escriba cualquiera}, {"Estado", escriba texto}, {"Contrato Vantage", escriba texto}, {"Contrato Colfinactiva", escriba texto}, {"VALIDADOR", Int64.Type}, {"A", escriba texto}, {"ADICIONAL DUPLICADO", Int64.Type}, {"ESTADO FILTRO", escriba texto}}),
+    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado1", each ([Estado] <> "Retiro")),
+    Personalizado1 = #"Filas filtradas",
+    #"Otras columnas quitadas" = Table.SelectColumns(Personalizado1,{"Numero", "Cargo", "Fecha de Ingreso", "Contrato Onest", "Fecha Contrato Onest "}),
+    #"Duplicados quitados" = Table.Distinct(#"Otras columnas quitadas", {"Numero"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Duplicados quitados","ASESOR COMERCIAL-LANCE LIBRE","ASESOR COMERCIAL",Replacer.ReplaceText,{"Cargo"}),
+    #"Filas filtradas1" = Table.SelectRows(#"Valor reemplazado", each ([Contrato Onest] = "CONTRATO DIGITAL" or [Contrato Onest] = "OK CONTRATO")),
+    #"Tipo cambiado" = Table.TransformColumnTypes(#"Filas filtradas1",{{"Fecha Contrato Onest ", escriba fecha}})
+en
+    #"Tipo cambiado"
+    
+// OJO ARCHIVOS PARA MODIFICAR_COLFINACTIVA FREE 
+dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\Plantilla General.xlsx"), null, true),
+    Tabla_Libre = Origen{[Ítem="Libre",Tipo="Tabla"]}[Datos],
+    #"Tipo cambiado1" = Table.TransformColumnTypes(Free_Table,{{"#", Int64.Type}, {"Tipo", escriba texto}, {"Numero", Int64.Type}, {"Nombre Completo", escriba texto}, {"Primer Apellido", escriba texto}, {"Segundo Apellido", escriba texto}, {"Primer Nombre", escriba texto}, {"Segundo Nombre", escriba texto}, {"Entrega Carne", escriba cualquiera}, {"Área", escriba texto}, {"Subárea", escriba texto}, {"Carga", escriba texto}, {"Genero ", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba cualquiera}, {"Periodo de Prueba ", escriba cualquiera}, {"Fecha de Inicio", Int64.Type}, {"Fecha de Finalizacion", Int64.Type}, {"DIas PP", Int64.Type}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba fecha}, {"Modalidad del Retiro", escriba texto}, {"Motivo del Retiro", escriba texto}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escriba texto}, {"Correo Electronico Personal 2", Int64.Type}, {"EPS", escriba texto}, {"Afiliacion", escriba cualquiera}, {"AFP", escriba texto}, {"Afiliacion2", escriba cualquiera}, {"CCF", escriba texto}, {"Afiliacion3", escriba cualquiera}, {"CES", escriba texto}, {"Numero de Cuenta", escriba cualquiera}, {"Tipo de Cuenta", escriba cualquiera}, {"Banco", escriba cualquiera}, {"Empresa", escriba cualquiera}, {"Escolaridad", escriba cualquiera}, {"Titulo Escolaridad", escriba cualquiera}, {"Caso de Emergencia", escriba cualquiera}, {"Teléfono Contacto", escriba cualquiera}, {"Estado Civil", escriba cualquiera}, {"Nombre del Conyuge", escriba cualquiera}, {"Tipo de Documento", escriba cualquiera}, {"Numero4", escriba cualquiera}, {"Fecha de Nacimiento5", type any}, {"Hijo 1", type any}, {"Tipo de Documento6", type any}, {"Numero7", type any}, {"Fecha de Nacimiento8", type any}, {"Hijo 2", type any}, {"Tipo de Documento9", type any}, {"Numero10", type any}, {"Fecha de Nacimiento11", type any}, {"Hijo 3", type any}, {"Tipo de Documento12", escriba cualquiera}, {"Numero13", escriba cualquiera}, {"Fecha de Nacimiento14",type any}, {"Hijo 4", type any}, {"Tipo de Documento15", type any}, {"Numero16", type any}, {"Fecha de Nacimiento17", type any}, {"Hijo 5", type any}, {"Tipo de Documento18", type any}, {"Numero19", type any}, {"Fecha de Nacimiento20", type any}, {"Fecha Actualizado", type any}, {"Fuero", escriba cualquiera}, {"Fecha Inicio Licencia", escriba cualquiera}, {"Fecha Final Licencia", escriba cualquiera}, {"Lactancia", escriba cualquiera}, {"Codigo CC", escriba cualquiera}, {"Descripcion CC", escriba cualquiera}, {"Estado", escriba texto}, {"Contrato Vantage", escriba texto}, {"Contrato Colfinactiva", escriba texto}, {"VALIDADOR", Int64.Type}, {"A", escriba texto}, {"ADICIONAL DUPLICADO", Int64.Type}, {"ESTADO FILTRO", tipo texto}}),
+    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado1", each ([Estado] = "Activo")),
+    #"Filas filtradas1" = Table.SelectRows(#"Filas filtradas", each ([Contrato Colfinactiva] <> null)),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas1",{"Numero", "Cargo", "Fecha de Ingreso", "Contrato Colfinactiva"}),
+    #"Duplicados quitados" = Table.Distinct(#"Otras columnas quitadas", {"Numero"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Duplicados quitados","ASESOR COMERCIAL-LANCE LIBRE","ASESOR COMERCIAL",Replacer.ReplaceText,{"Cargo"})
+en
+    #"Valor reemplazado"
+
+    // OJO ARCHIVOS PARA MODIFICAR _COLFINACTIVA PLANTA 
+    dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\FUERZA COMERCIAL\Fuerza Comercial\2025\12_Diciembre 2025\Plantilla General.xlsx"), null, true),
+    Planta_Table = Origen{[Item="Planta",Kind="Table"]}[Data],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Planta_Table,{{"Tipo", type text}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Primer Apellido", type text}, {"Segundo Apellido", type text}, {"Primer Nombre", type text}, {"Segundo Nombre", type text}, {"Entrega Carne", type any}, {"Área", escriba texto}, {"Subárea", escriba texto}, {"Carga", escriba texto}, {"Genero", escriba texto}, {"Fecha de Ingreso", escriba fecha}, {"Antigüedad en la CompañIa", escriba texto}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba texto}, {"Periodo de Prueba ", escriba texto}, {"Fecha de Inicio", escriba fecha}, {"Fecha de Finalizacion", escriba fecha}, {"Dias PP", escriba texto}, {"Fecha Inicio Etapa Productiva", escriba cualquiera}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", escriba cualquiera}, {"Modalidad del Retiro", escriba cualquiera}, {"Motivo del Retiro", escriba cualquiera}, {"Fecha de Nacimiento", escriba fecha}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Lugar de Expedición", escriba texto}, {"Fecha de Expedición", escriba fecha}, {"Lugar de Nacimiento", escriba texto}, {"Ciudad de Residencia", escriba texto}, {"Dirección", escriba texto}, {"Teléfono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electrónico Personal", escriba cualquiera}, {"Correo Electronico Corporativo", escriba cualquiera}, {"Fecha de Ultimo Aumento", escriba fecha}, {"Salario Anterior en Basico ", Int64.Type}, {"Regimen", escriba texto}, {"Salario Basico", Int64.Type}, {"Auxilio de Transporte", Int64.Type}, {"Auxilio de Vivienda", Int64.Type}, {"Auxilio de Movilizacion", Int64.Type}, {"Auxilio de Comunicacion", Int64.Type}, {"Bonos", Int64.Type}, {"Total Devengado", Int64.Type}, {"EPS", escribe texto}, {"Afiliacion", escribe texto}, {"AFP", escribe texto}, {"Afiliacion2", escribe texto}, {"CCF", escribe texto}, {"Afiliacion3", escribe texto}, {"CES", escriba texto}, {"Número de Cuenta", Int64.Type}, {"Tipo de Cuenta", escriba texto}, {"Banco", escriba texto}, {"Empresa", escriba texto}, {"Escolaridad", escriba texto}, {"Titulo Escolaridad", escriba texto}, {"Caso de Emergencia", escriba cualquiera}, {"Teléfono Contacto", escriba cualquiera}, {"Estado Civil", escriba texto}, {"Nombre del Conyuge", escriba texto}, {"Tipo de Documento", escriba texto}, {"Numero4", Int64.Type}, {"Fecha de Nacimiento5", escriba fecha}, {"Hijo 1",escriba texto}, {"Tipo de Documento6", escriba texto}, {"Numero7", Int64.Type}, {"Fecha de Nacimiento8", escriba fecha}, {"Hijo 2", escriba texto}, {"Tipo de Documento9", escriba texto}, {"Numero10", Int64.Type}, {"Fecha de Nacimiento11", escriba fecha}, {"Hijo 3", escriba texto}, {"Tipo de Documento12", escriba texto}, {"Numero13", Int64.Type}, {"Fecha de Nacimiento14", escriba fecha}, {"Hijo 4", escriba cualquiera}, {"Tipo de Documento15", escriba cualquiera}, {"Numero16", escriba cualquiera}, {"Fecha de Nacimiento17", escriba cualquiera}, {"Hijo 5", escriba cualquiera}, {"Tipo de Documento18", escriba cualquiera}, {"Numero19", escriba cualquiera}, {"Fecha de Nacimiento20", escriba cualquiera}, {"Fecha Actualizado", escriba fecha}, {"Fuero", escriba cualquiera}, {"Fecha Inicio Licencia", escriba cualquiera}, {"Fecha Final Licencia", escriba cualquiera}, {"Lactancia", escriba cualquiera}, {"Codigo CC", Int64.Type}, {"Descripcion CC", escriba texto}, {"Estado", escriba texto}, {"ADICIONAL DUPLICADO", escriba cualquiera}, {"ESTADO FILTRO", escriba texto}}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Tipo cambiado","CALI 1","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","CALI 2","CALI",Replacer.ReplaceText,{"Oficina"}),
+    #"Filas filtradas1" = Table.SelectRows(#"Valor reemplazado1", each ([Cargo] = "ASESOR COMERCIAL")),
+    #"Filas filtradas" = Table.SelectRows(#"Filas filtradas1", each ([Estado] = "Activo")),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas",{"Numero", "Cargo", "Fecha de Ingreso"}),
+    #"Personalizada agregada" = Table.AddColumn(#"Otras columnas quitadas", "Contrato Colfinactia", each "OK CONTRATO")
+en
+    #"Personalizada agregada"
+
+    //OJO ARCHIVOS PARA MODIFICAR _FREE ACTIVOS (2)
+    dejar
+    Origen = #"ACTIVOS gratis"
+en
+    Origen
+
+    //ENTIDADES AUTORIZADAS_ COLPATRIA (2)
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Colpatria"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULA", Int64.Type}, {"PRODUCTO", escriba texto}})
+en
+
+    #"Tipo cambiado"
+
+    //ENTIDADES AUTORIZADAS__BAYPORT (2)
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Bayport"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULA", Int64.Type}, {"PRODUCTO", type text}}),
+    #"Errores quitados" = Table.RemoveRowsWithErrors(#"Tipo cambiado", {"CEDULA"})
+en
+    #"Errores eliminados"
+
+    //ENTIDADES AUTORIZADAS__ AV VILLAS
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Av_Villas"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULA", Int64.Type}, {"PRODUCTO", escriba texto}})
+en
+    #"Tipo cambiado"
+
+
+    //ENTIDADES AUTORIZADAS__CSC
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="CSC"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULA", Int64.Type}, {"PRODUCTO", escriba texto}})
+en
+    #"Tipo cambiado"
+    
+    //AUTORIZADOS ENTIDADES_AUTORIZADOS POPULARES
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="AUTORIZADOS_POPULAR"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULA", Int64.Type}, {"PRODUCTO", type text}}),
+    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado", each ([EXCLUSIONES] = " "))
+en
+    #"Filas filtradas"
+
+     //AUTORIZADOS ENTIDADES_GNB SUDAMERIS 
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Tabla9"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULA", Int64.Type}, {"PRODUCTO", escriba texto}})
+en
+    #"Tipo cambiado"
+    //AUTORIZADOS ENTIDADES_Banco occidente (2)_ 
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Banco_Occidente"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULA", Int64.Type}, {"PRODUCTO", escriba texto}})
+en
+    #"Tipo cambiado"
+    // PLANTILLA PARA REPORTAR POPULAR 
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Name="Consolidado_Bases"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"No de Carta", Int64.Type}, {"Tipo", type text}, {"ESPECIAL", Int64.Type}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Area", type text}, {"Subarea", type text}, {"Cargo", type text}, {"Genero", type texto}, {"Fecha de Ingreso", escriba fecha y hora}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba texto}, {"OFICINA HOMOLOGADA", escriba texto}, {"REGIONAL", escriba texto}, {"DEPARTAMENTO", escriba texto}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", Int64.Type}, {"Modalidad del Retiro", escribe texto}, {"Motivo del Retiro", escribe texto}, {"Fecha de Nacimiento", escribe fecha y hora}, {"Edad", escribe texto}, {"Grupo Sanguineo", escribe texto}, {"Telefono Fijo", escribe cualquiera}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escribe texto}, {"Correo Electronico Corporativo", escriba texto}, {"EPS", escriba texto}, {"Afiliación", escriba cualquiera}, {"AFP", escriba texto}, {"CCF", escriba texto}, {"CES", escriba texto}, {"Estado", escriba texto}, {"NODO", escriba texto}, {"Contrato Vantage", escriba texto}, {"Contrato Colfinactiva", escriba texto}, {"Contrato Onest", escriba texto}, {"ESTADO FILTRO", escriba texto}, {"Estado Colpatria", escriba texto}, {"Estado Av Villas", escriba texto}, {"Estado Bayport", escriba texto}, {"Estado CSC", escriba texto}, {"Estado GNB Sudameris", escriba texto}, {"Estado BANCO POPULAR", escriba texto}, {"Nombre Completo - Copia", escriba texto}, {"Recuento_Activo", Int64.Type}, {"Recuento_Retirado", Int64.Type}, {"CONTAR", Int64.Type}, {"ANALISIS DUPLICADOS_3", escribe texto}}),
+    #"FILTRO SOLO CONTRATOS" = Table.SelectRows(#"Tipo cambiado", each ([Contrato Onest] <> null and [Contrato Onest] <> "OK CONTRATO_NO SOLICITAR " and [Contrato Onest] <> "PD")),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"FILTRO SOLO CONTRATOS",{"Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Fecha Contrato Vantage", "Contrato Colfinactiva", "Estado Onest", "Contrato Onest", "Fecha Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3"}),
+    #"Columna condicional agregada" = Table.AddColumn(#"Otras columnas quitadas", "Descripcion tipo de documento", each if [Tipo] = "CC" then "CÉDULA DE CIUDADANÍA" else if [Tipo] = "CE" then "CÉDULA DE EXTRANJERÍA" else if [Tipo] = "PA" then "PASAPORTE" else "VALIDAR"),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Columna condicional agregada",{"Tipo", "Descripcion tipo de documento", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas reordenadas",{{"Numero", "No. De Identificación"}}),
+    #"Texto recortado" = Table.TransformColumns(#"Columnas con nombre cambiado",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Texto limpio" = Table.TransformColumns(#"Texto recortado",{{"Nombre Completo", Text.Clean, type text}}),
+    #"Columna duplicada" = Table.DuplicateColumn(#"Texto limpio", "Nombre Completo", "Nombre Completo - Copia.1"),
+    #"Dividir columna por delimitador" = Table.SplitColumn(#"Columna duplicada", "Nombre Completo - Copia.1", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5"}),
+    #"Columnas reordenadas1" = Table.ReorderColumns(#"Dividir columna por delimitador",{"Tipo", "Descripcion tipo de documento", "No. De Identificación", "Area", "Subarea", "Cargo", "Genero", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas reordenadas1","M","MASCULINO",Replacer.ReplaceText,{"Genero"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","F","FEMENINO",Replacer.ReplaceText,{"Genero"}),
+    #"Columnas reordenadas2" = Table.ReorderColumns(#"Valor reemplazado1",{"Tipo", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Electronico Personal", "Celular Personal", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Corporativo", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas reordenadas2",{{"Tipo", "Tipo de Documento"}, {"Correo Electronico Personal", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)"}, {"Celular Personal", "Celular Usuario"}}),
+    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado1", "Gerencia a carga del servicio", each "GCIA NACIONAL DE PRODUCTO DE LIBRANZA"),
+    #"Columnas reordenadas3" = Table.ReorderColumns(#"Personalizada agregada",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electronico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada1" = Table.AddColumn(#"Columnas reordenadas3", "Código Centro de Costo Gerencia a carga del servicio", cada 167),
+    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Personalizada agregada1",{{"Código Centro de Costo Gerencia a carga del servicio", Int64.Type}}),
+    #"Columnas reordenadas4" = Table.ReorderColumns(#"Tipo cambiado1",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electrónico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada2" = Table.AddColumn(#"Columnas reordenadas4", "Nombre Empresa Contratista", cada "ONEST"),
+    #"Columnas reordenadas5" = Table.ReorderColumns(#"Personalizada agregada2",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Area", "Subarea", "Cargo","Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electronico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada3" = Table.AddColumn(#"Columnas reordenadas5", "Nit Empresa Contratista", cada una "800080575-7"),
+    #"Columnas reordenadas6" = Table.ReorderColumns(#"Personalizada agregada3",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Corporativo", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada6" = Table.AddColumn(#"Columnas reordenadas6", "Fecha Inicio Operación Banco Popular", cada una "04/08/2021"),
+    #"Tipo cambiado5" = Table.TransformColumnTypes(#"Personalizada agregada6",{{"Fecha Inicio Operación Banco Popular", escriba fecha}}),
+    #"Personalizada agregada7" = Table.AddColumn(#"Tipo cambiado5", "Fecha Fin Operación Banco Popular", each " "),
+    #"Personalizada agregada9" = Table.AddColumn(#"Personalizada agregada7", "Nombre líder a carga del servicio en la Empresa contratista", each "CARLOS ENRIQUE ZULUAGA VANEGAS"),
+    #"Personalizada agregada10" = Table.AddColumn(#"Personalizada agregada9", "Correo Electronico ", each "czuluaga@vantage.com.co"),
+    #"Personalizada agregada11" = Table.AddColumn(#"Personalizada agregada10", "Celular Lider Empresa Contratista", cada uno 3104980912),
+    #"Tipo cambiado6" = Table.TransformColumnTypes(#"Personalizada agregada11",{{"Celular Lider Empresa Contratista", Int64.Type}}),
+    #"Personalizada agregada12" = Table.AddColumn(#"Tipo cambiado6", "N° Contrato, Orden de Compra u OtroSI", each "PBS2100030"),
+    #"Personalizada agregada13" = Table.AddColumn(#"Personalizada agregada12", "Lider Banco a carga del servicio", each "FABIAN DELGADO SANCHEZ"),
+    #"Personalizada agregada14" = Table.AddColumn(#"Personalizada agregada13", "Identificacion Lider Banco", cada uno 72267144),
+    #"Personalizada agregada15" = Table.AddColumn(#"Personalizada agregada14", "Area del lider Banco a carga del servicio", each "GERENCIA DE PRODUCTO LIBRANZA"),
+    #"Personalizada agregada16" = Table.AddColumn(#"Personalizada agregada15", "Manejo herramientas Banco", cada if [Cargo]="ANALISTA OPERATIVO" luego "SI"
+demás 
+si [Cargo]="ANALISTA JUNIOR OPERATIVO" entonces "SI"
+demás
+si [Cargo]="ANALISTA MESA OPERATIVA" entonces "SI"
+demás
+si [Cargo]="AUXILIAR OPERATIVO" entonces "SI"
+demás
+si [Cargo]="DIRECTORA OPERATIVA" entonces "SI"
+de lo contrario "NO"),
+    #"Columnas reordenadas7" = Table.ReorderColumns(#"Personalizada agregada16",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Area", "Subárea", "Carga", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electronico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANÁLISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas reordenadas7",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Cargo", "Oficina", "Nombre Jefe Directo", "Estado Onest", "Fecha Contrato Onest", "Estado", "Contrato Onest", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas reordenadas11" = Table.ReorderColumns(#"Otras columnas quitadas1",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Cargo", "Oficina", "Fecha Contrato Onest ", "Estado", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Contrato Onest"}),
+    #"Columnas con nombre cambiado5" = Table.RenameColumns(#"Columnas reordenadas11",{{"Fecha Contrato Onest ", "Fecha inicio contrato Empresa Contratista"}}),
+    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Columnas con nombre cambiado5",{{"Fecha inicio contrato Empresa Contratista", type date}}),
+    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Tipo cambiado2",{{"Oficina", "Ciudad"}}),
+    #"Índice agregado" = Table.AddIndexColumn(#"Columnas con nombre cambiado4", "Índice", 1, 1, Int64.Type),
+    #"Columnas reordenadas8" = Table.ReorderColumns(#"Índice agregado",{"Índice", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista","Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre lider a cargo del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a cargo del servicio", "Identificacion Lider Banco", "Area del lider Banco a cargo del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columnas reordenadas8",{{"Índice", "N°"}}),
+    #"Tipo cambiado3" = Table.TransformColumnTypes(#"Columnas con nombre cambiado2",{{"Fecha de Nacimiento", type date}}),
+    #"Columnas reordenadas9" = Table.ReorderColumns(#"Tipo cambiado3",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Cargo", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Columnas reordenadas9",{{"Cargo", "Servicio"}}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Columnas con nombre cambiado3","AGENTE EXCLUSIVO_ELITE","AGENTE EXCLUSIVO",Replacer.ReplaceText,{"Servicio"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","ASESOR FREE LANCE_ELITE","ASESOR FREE LANCE",Replacer.ReplaceText,{"Servicio"}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado3","BOGOTA 3","BOGOTA",Replacer.ReplaceText,{"Ciudad"}),
+    #"Columnas reordenadas10" = Table.ReorderColumns(#"Valor reemplazado5",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Servicio", "Fecha inicio contrato Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Ciudad", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Área del líder Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Estado"}),
+    #"OFICINAS AUTORIZADAS" = Table.SelectRows(#"Columnas reordenadas10", cada una ([Ciudad] <> "BARRANQUILLA" and [Ciudad] <> "BARRANQUILLA_ASESOR ELITE ESPECIAL_CARLOS AUGUSTO JACOME ALVAREZ" and [Ciudad] <> "POPAYAN" and [Ciudad] <> "POPAYAN_ASESOR ELITE ESPECIAL_SHIRLEY GENOVER HURTADO HURTADO" y [Ciudad] <> "SANTA MARTA" y [Ciudad] <> "VILLAVICENCIO")),
+    Personalizado1 = #"OFICINAS AUTORIZADAS",
+    #"ASESORES SIN DATO" = Table.SelectRows(Personalizado1, each ([Fecha de Nacimiento] <> null)),
+    #"Consultas combinadas" = Table.NestedJoin(#"ASESORES SIN DATO", {"No. De Identificación"}, AUTORIZADOS_POPULAR, {"CEDULA"}, "AUTORIZADOS_POPULAR", JoinKind.LeftOuter),
+    #"Se expandió AUTORIZADOS_POPULAR" = Table.ExpandTableColumn(#"Consultas combinadas", "AUTORIZADOS_POPULAR", {"PRODUCTO"}, {"AUTORIZADOS_POPULAR.PRODUCTO"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Se expandió AUTORIZADOS_POPULAR","BANCO POPULAR","CODIGO ACTIVO",Replacer.ReplaceValue,{"AUTORIZADOS_POPULAR.PRODUCTO"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado4",null,"SIN CODIGO",Replacer.ReplaceValue,{"AUTORIZADOS_POPULAR.PRODUCTO"}),
+    #"Columnas reordenadas12" = Table.ReorderColumns(#"Valor reemplazado6",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Servicio", "Fecha inicio contrato Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Ciudad", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Área del líder Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Contrato Onest", "Estado", "AUTORIZADOS_POPULAR.PRODUCTO", "Nombre Jefe Directo"}),
+    #"Consulta anexada" = Table.Combine({#"Columnas reordenadas12", #"PLANTILLA PARA REPORTAR POPULAR (2)"}),
+    #"Columnas reordenadas13" = Table.ReorderColumns(#"Consulta anexada",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Servicio", "Fecha inicio contrato Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Ciudad", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del líder Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Estado Onest", "Contrato Onest", "Estado", "AUTORIZADOS_POPULAR.PRODUCTO", "Nombre Jefe Directo"}),
+    #"Consultas combinadas1" = Table.NestedJoin(#"Columnas reordenadas13", {"Nombre Jefe Directo"}, #"Directores Oficina", {"Nombre Completo"}, "Directores Oficina", JoinKind.LeftOuter),
+    #"Se expandió Directores Oficina" = Table.ExpandTableColumn(#"Consultas combinadas1", "Directores Oficina", {"Nombre Completo"}, {"Directores Oficina.Nombre Completo"}),
+    #"Personalizada agregada4" = Table.AddColumn(#"Se expandió Directores Oficina", "Personalizado", each if[Nombre Jefe Directo]=[Directores Oficina.Nombre Completo] then [Nombre Jefe Directo]
+
+demás
+
+if [Nombre Jefe Directo]="GIOVANNA EDITH DAZA PEREZ" entonces "GIOVANNA EDITH DAZA PEREZ"
+
+demás
+
+"CARLOS ENRIQUE ZULUAGA VENEGAS"),
+    #"Columnas quitadas" = Table.RemoveColumns(#"Personalizada agregada4",{"Nombre Jefe Directo", "Directores Oficina.Nombre Completo"}),
+    #"Columnas con nombre cambiado6" = Table.RenameColumns(#"Columnas quitadas",{{"Personalizado", "Nombre Jefe Directo"}}),
+    #"Consultas combinadas2" = Table.NestedJoin(#"Columnas con nombre cambiado6", {"Nombre Jefe Directo"}, #"Directores Oficina", {"Nombre Completo"}, "Directores Oficina", JoinKind.LeftOuter),
+    #"Se expandió Directores Oficina1" = Table.ExpandTableColumn(#"Consultas combinadas2", "Directores Oficina", {"Numero"}, {"Directores Oficina.Numero"}),
+    #"Personalizada agregada5" = Table.AddColumn(#"Se expandió Directores Oficina1", "Personalizado", each if [Nombre Jefe Directo] = "CARLOS ENRIQUE ZULUAGA VENEGAS" then "16272128" 
+
+demás
+
+if [Nombre Jefe Directo] = "GIOVANNA EDITH DAZA PEREZ" entonces "53159542"
+
+demás
+
+[Directores Oficina.Numero]),
+    #"Tipo cambiado4" = Table.TransformColumnTypes(#"Personalizada agregada5",{{"Personalizado", Int64.Type}}),
+    #"Columnas quitadas1" = Table.RemoveColumns(#"Tipo cambiado4",{"Directores Oficina.Numero"}),
+    #"Columnas con nombre cambiado7" = Table.RenameColumns(#"Columnas quitadas1",{{"Personalizado", "CED SUPERVISOR"}}),
+    #"Duplicados quitados" = Table.Distinct(#"Columnas con nombre cambiado7", {"No. De Identificación"})
+en
+    #"Duplicados quitados"
+
+    // PLANTILLA PARA REPORTAR POPULAR(2)
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Name="Consolidado_Bases"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"No de Carta", Int64.Type}, {"Tipo", type text}, {"ESPECIAL", Int64.Type}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Area", type text}, {"Subarea", type text}, {"Cargo", type text}, {"Genero", type texto}, {"Fecha de Ingreso", escriba fecha y hora}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba texto}, {"OFICINA HOMOLOGADA", escriba texto}, {"REGIONAL", escriba texto}, {"DEPARTAMENTO", escriba texto}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", Int64.Type}, {"Modalidad del Retiro", escribe texto}, {"Motivo del Retiro", escribe texto}, {"Fecha de Nacimiento", escribe fecha y hora}, {"Edad", escribe texto}, {"Grupo Sanguineo", escribe texto}, {"Telefono Fijo", escribe cualquiera}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escribe texto}, {"Correo Electronico Corporativo", escriba texto}, {"EPS", escriba texto}, {"Afiliación", escriba cualquiera}, {"AFP", escriba texto}, {"CCF", escriba texto}, {"CES", escriba texto}, {"Estado", escriba texto}, {"NODO", escriba texto}, {"Contrato Vantage", escriba texto}, {"Contrato Colfinactiva", escriba texto}, {"Contrato Onest", escriba texto}, {"ESTADO FILTRO", escriba texto}, {"Estado Colpatria", escriba texto}, {"Estado Av Villas", escriba texto}, {"Estado Bayport", escriba texto}, {"Estado CSC", escriba texto}, {"Estado GNB Sudameris", escriba texto}, {"Estado BANCO POPULAR", escriba texto}, {"Nombre Completo - Copia", escriba texto}, {"Recuento_Activo", Int64.Type}, {"Recuento_Retirado", Int64.Type}, {"CONTAR", Int64.Type}, {"ANALISIS DUPLICADOS_3", escribe texto}}),
+    #"Consultas combinadas1" = Table.NestedJoin(#"Tipo cambiado", {"Numero"}, #"CEDULAS ONEST NO INCLUIDOS", {"CEDULAS ONEST NO INCLUIDOS"}, "CEDULAS ONEST NO INCLUIDOS", JoinKind.LeftOuter),
+    #"Se expandió CEDULAS ONEST NO INCLUIDOS" = Table.ExpandTableColumn(#"Consultas combinadas1", "CEDULAS ONEST NO INCLUIDOS", {"CEDULAS ONEST NO INCLUIDOS"}, {"CEDULAS ONEST NO INCLUIDOS.CEDULAS ONEST NO INCLUIDOS"}),
+    #"Filas filtradas" = Table.SelectRows(#"Se expandió CEDULAS ONEST NO INCLUIDOS", each ([CEDULAS ONEST NO INCLUIDOS.CEDULAS ONEST NO INCLUIDOS] <> null)),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas",{"Tipo", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Fecha Contrato Vantage", "Contrato Colfinactiva", "Estado Onest", "Contrato Onest", "Fecha Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3"}),
+    #"Columna condicional agregada" = Table.AddColumn(#"Otras columnas quitadas", "Descripcion tipo de documento", each if [Tipo] = "CC" then "CÉDULA DE CIUDADANÍA" else if [Tipo] = "CE" then "CÉDULA DE EXTRANJERÍA" else if [Tipo] = "PA" then "PASAPORTE" else "VALIDAR"),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Columna condicional agregada",{"Tipo", "Descripcion tipo de documento", "Numero", "Nombre Completo", "Area", "Subarea", "Cargo", "Genero", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3"}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Columnas reordenadas",{{"Numero", "No. De Identificación"}}),
+    #"Texto recortado" = Table.TransformColumns(#"Columnas con nombre cambiado",{{"Nombre Completo", Text.Trim, type text}}),
+    #"Texto limpio" = Table.TransformColumns(#"Texto recortado",{{"Nombre Completo", Text.Clean, type text}}),
+    #"Columna duplicada" = Table.DuplicateColumn(#"Texto limpio", "Nombre Completo", "Nombre Completo - Copia.1"),
+    #"Dividir columna por delimitador" = Table.SplitColumn(#"Columna duplicada", "Nombre Completo - Copia.1", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5"}),
+    #"Columnas reordenadas1" = Table.ReorderColumns(#"Dividir columna por delimitador",{"Tipo", "Descripcion tipo de documento", "No. De Identificación", "Area", "Subarea", "Cargo", "Genero", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Fecha de Nacimiento", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Personal", "Celular Corporativo", "Correo Electrónico Personal", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Valor reemplazado" = Table.ReplaceValue(#"Columnas reordenadas1","M","MASCULINO",Replacer.ReplaceText,{"Genero"}),
+    #"Valor reemplazado1" = Table.ReplaceValue(#"Valor reemplazado","F","FEMENINO",Replacer.ReplaceText,{"Genero"}),
+    #"Columnas reordenadas2" = Table.ReorderColumns(#"Valor reemplazado1",{"Tipo", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Electronico Personal", "Celular Personal", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Corporativo", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Columnas reordenadas2",{{"Tipo", "Tipo de Documento"}, {"Correo Electronico Personal", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)"}, {"Celular Personal", "Celular Usuario"}}),
+    #"Personalizada agregada" = Table.AddColumn(#"Columnas con nombre cambiado1", "Gerencia a carga del servicio", each "GCIA NACIONAL DE PRODUCTO DE LIBRANZA"),
+    #"Columnas reordenadas3" = Table.ReorderColumns(#"Personalizada agregada",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electronico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada1" = Table.AddColumn(#"Columnas reordenadas3", "Código Centro de Costo Gerencia a carga del servicio", cada 167),
+    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Personalizada agregada1",{{"Código Centro de Costo Gerencia a carga del servicio", Int64.Type}}),
+    #"Columnas reordenadas4" = Table.ReorderColumns(#"Tipo cambiado1",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electrónico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada2" = Table.AddColumn(#"Columnas reordenadas4", "Nombre Empresa Contratista", cada "ONEST"),
+    #"Columnas reordenadas5" = Table.ReorderColumns(#"Personalizada agregada2",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Area", "Subarea", "Cargo","Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electronico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada3" = Table.AddColumn(#"Columnas reordenadas5", "Nit Empresa Contratista", cada una "800080575-7"),
+    #"Columnas reordenadas6" = Table.ReorderColumns(#"Personalizada agregada3",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Area", "Subarea", "Cargo", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Teléfono Fijo", "Celular Corporativo", "Correo Electrónico Corporativo", "EPS", "Afiliación", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANALISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Personalizada agregada6" = Table.AddColumn(#"Columnas reordenadas6", "Fecha Inicio Operación Banco Popular", cada una "04/08/2021"),
+    #"Tipo cambiado5" = Table.TransformColumnTypes(#"Personalizada agregada6",{{"Fecha Inicio Operación Banco Popular", escriba fecha}}),
+    #"Personalizada agregada7" = Table.AddColumn(#"Tipo cambiado5", "Fecha Fin Operación Banco Popular", each " "),
+    #"Personalizada agregada9" = Table.AddColumn(#"Personalizada agregada7", "Nombre líder a carga del servicio en la Empresa contratista", each "CARLOS ENRIQUE ZULUAGA VANEGAS"),
+    #"Personalizada agregada10" = Table.AddColumn(#"Personalizada agregada9", "Correo Electronico ", each "czuluaga@vantage.com.co"),
+    #"Personalizada agregada11" = Table.AddColumn(#"Personalizada agregada10", "Celular Lider Empresa Contratista", cada uno 3104980912),
+    #"Tipo cambiado6" = Table.TransformColumnTypes(#"Personalizada agregada11",{{"Celular Lider Empresa Contratista", Int64.Type}}),
+    #"Personalizada agregada12" = Table.AddColumn(#"Tipo cambiado6", "N° Contrato, Orden de Compra u OtroSI", each "PBS2100030"),
+    #"Personalizada agregada13" = Table.AddColumn(#"Personalizada agregada12", "Lider Banco a carga del servicio", each "FABIAN DELGADO SANCHEZ"),
+    #"Personalizada agregada14" = Table.AddColumn(#"Personalizada agregada13", "Identificacion Lider Banco", cada uno 72267144),
+    #"Personalizada agregada15" = Table.AddColumn(#"Personalizada agregada14", "Area del lider Banco a carga del servicio", each "GERENCIA DE PRODUCTO LIBRANZA"),
+    #"Personalizada agregada16" = Table.AddColumn(#"Personalizada agregada15", "Manejo herramientas Banco", cada "NO"),
+    #"Columnas reordenadas7" = Table.ReorderColumns(#"Personalizada agregada16",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Area", "Subárea", "Carga", "Tipo de Contrato", "Dashboard", "OFICINA HOMOLOGADA", "REGIONAL", "DEPARTAMENTO", "Oficina", "Nombre Jefe Directo", "Cargo Jefe Directo", "Fecha de Retiro", "Modalidad del Retiro", "Motivo del Retiro", "Edad", "Grupo Sanguineo", "Telefono Fijo", "Celular Corporativo", "Correo Electronico Corporativo", "EPS", "Afiliacion", "AFP", "CCF", "CES", "Estado", "NODO", "Contrato Vantage", "Contrato Colfinactiva", "Contrato Onest", "ESTADO FILTRO", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "Estado GNB Sudameris", "Estado BANCO POPULAR", "Nombre Completo - Copia", "Recuento_Activo", "Recuento_Retirado", "CONTAR", "ANÁLISIS DUPLICADOS_3", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Otras columnas quitadas1" = Table.SelectColumns(#"Columnas reordenadas7",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Cargo", "Oficina", "Nombre Jefe Directo", "Estado Onest", "Fecha Contrato Onest", "Estado", "Contrato Onest", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas reordenadas11" = Table.ReorderColumns(#"Otras columnas quitadas1",{"Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Cargo", "Oficina", "Fecha Contrato Onest ", "Estado", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Contrato Onest"}),
+    #"Columnas con nombre cambiado5" = Table.RenameColumns(#"Columnas reordenadas11",{{"Fecha Contrato Onest ", "Fecha inicio contrato Empresa Contratista"}}),
+    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Columnas con nombre cambiado5",{{"Fecha inicio contrato Empresa Contratista", type date}}),
+    #"Columnas con nombre cambiado4" = Table.RenameColumns(#"Tipo cambiado2",{{"Oficina", "Ciudad"}}),
+    #"Índice agregado" = Table.AddIndexColumn(#"Columnas con nombre cambiado4", "Índice", 1, 1, Int64.Type),
+    #"Columnas reordenadas8" = Table.ReorderColumns(#"Índice agregado",{"Índice", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista","Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre lider a cargo del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a cargo del servicio", "Identificacion Lider Banco", "Area del lider Banco a cargo del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas con nombre cambiado2" = Table.RenameColumns(#"Columnas reordenadas8",{{"Índice", "N°"}}),
+    #"Tipo cambiado3" = Table.TransformColumnTypes(#"Columnas con nombre cambiado2",{{"Fecha de Nacimiento", type date}}),
+    #"Columnas reordenadas9" = Table.ReorderColumns(#"Tipo cambiado3",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a carga del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Cargo", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Area del lider Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo"}),
+    #"Columnas con nombre cambiado3" = Table.RenameColumns(#"Columnas reordenadas9",{{"Cargo", "Servicio"}}),
+    #"Valor reemplazado2" = Table.ReplaceValue(#"Columnas con nombre cambiado3","AGENTE EXCLUSIVO_ELITE","AGENTE EXCLUSIVO",Replacer.ReplaceText,{"Servicio"}),
+    #"Valor reemplazado3" = Table.ReplaceValue(#"Valor reemplazado2","ASESOR FREE LANCE_ELITE","ASESOR FREE LANCE",Replacer.ReplaceText,{"Servicio"}),
+    #"Valor reemplazado5" = Table.ReplaceValue(#"Valor reemplazado3","BOGOTA 3","BOGOTA",Replacer.ReplaceText,{"Ciudad"}),
+    #"Columnas reordenadas10" = Table.ReorderColumns(#"Valor reemplazado5",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Servicio", "Fecha inicio contrato Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Ciudad", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Área del líder Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Estado"}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Columnas reordenadas10", {"No. De Identificación"}, AUTORIZADOS_POPULAR, {"CEDULA"}, "AUTORIZADOS_POPULAR", JoinKind.LeftOuter),
+    #"Se expandió AUTORIZADOS_POPULAR" = Table.ExpandTableColumn(#"Consultas combinadas", "AUTORIZADOS_POPULAR", {"PRODUCTO"}, {"AUTORIZADOS_POPULAR.PRODUCTO"}),
+    #"Valor reemplazado4" = Table.ReplaceValue(#"Se expandió AUTORIZADOS_POPULAR","BANCO POPULAR","CODIGO ACTIVO",Replacer.ReplaceValue,{"AUTORIZADOS_POPULAR.PRODUCTO"}),
+    #"Valor reemplazado6" = Table.ReplaceValue(#"Valor reemplazado4",null,"SIN CODIGO",Replacer.ReplaceValue,{"AUTORIZADOS_POPULAR.PRODUCTO"}),
+    #"Columnas reordenadas12" = Table.ReorderColumns(#"Valor reemplazado6",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Servicio", "Fecha inicio contrato Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Ciudad", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Área del líder Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Contrato Onest", "Estado", "AUTORIZADOS_POPULAR.PRODUCTO", "Nombre Jefe Directo"}),
+    #"Valor reemplazado7" = Table.ReplaceValue(#"Columnas reordenadas12",null,#date(2021, 12, 15),Replacer.ReplaceValue,{"Fecha inicio contrato Empresa Contratista"}),
+    #"Valor reemplazado8" = Table.ReplaceValue(#"Valor reemplazado7",null,"OK CONTRATO",Replacer.ReplaceValue,{"Contrato Onest"}),
+    #"Columnas reordenadas13" = Table.ReorderColumns(#"Valor reemplazado8",{"N°", "Tipo de Documento", "Descripcion tipo de documento", "No. De Identificación", "Genero", "Fecha de Nacimiento", "Correo Institucional#(cr)#(lf)usuario#(cr)#(lf)", "Celular Usuario", "Gerencia a carga del servicio", "Código Centro de Costo Gerencia a cargo del servicio", "Nombre Empresa Contratista", "Nit Empresa Contratista", "Servicio", "Fecha inicio contrato Empresa Contratista", "Fecha Inicio Operación Banco Popular", "Fecha Fin Operación Banco Popular", "Ciudad", "Nombre líder a carga del servicio en la Empresa contratista", "Correo Electronico ", "Celular Lider Empresa Contratista", "N° Contrato, Orden de Compra u OtroSI", "Lider Banco a carga del servicio", "Identificacion Lider Banco", "Área del líder Banco a carga del servicio", "Manejo herramientas Banco", "Nombre Completo - Copia.1.1", "Nombre Completo - Copia.1.2", "Nombre Completo - Copia.1.3", "Nombre Completo - Copia.1.4", "Nombre Completo - Copia.1.5", "Nombre Completo", "Estado Onest", "Contrato Onest", "Estado","AUTORIZADOS_POPULAR.PRODUCTO", "Nombre Jefe Directo"}),
+    #"Filas ordenadas" = Table.Sort(#"Columnas reordenadas13",{{"Servicio", Order.Ascending}})
+en
+    #"Filas ordenadas"
+
+    //CEDULAS ONEST NO INCLUIDAS 
+    dejar
+    Origen = Tabla.FromRows(Json.Documento(Binario.Descomprimir(Binario.FromText("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", BinaryEncoding.Base64), Compression.Deflate)), sea _t = ((tipo texto que acepta valores nulos) meta [Serialized.Text = true]) en la tabla de tipos [#"CEDULAS ONESTES NO INCLUIDOS" = _t]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"CEDULAS ONESTES NO INCLUIDOS", Int64.Type}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"CEDULAS ONESTES NO INCLUIDOS", "CEDULAS ONEST NO INCLUIDOS"}}),
+    #"Duplicados quitados" = Table.Distinct(#"Columnas con nombre cambiado")
+en
+    #"Duplicados quitados"
+
+    // CORRECCION_ASESORES_GENERAL
+    dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\MIS PLANTILLAS\CORRECCION MASIVA ERRORES.xlsx"), null, true),
+    CORRECCION_ASESORES_GENERAL_Table = Origen{[Item="CORRECCION_ASESORES_GENERAL",Kind="Tabla"]}[Datos],
+    #"Tipo cambiado" = Table.TransformColumnTypes(CORRECCION_ASESORES_GENERAL_Table,{{"TIPO ASESOR ERROR", escriba texto}, {"TIPO ASESOR CORREGIDO", escriba texto}})
+en
+    #"Tipo cambiado"
+    
+    // OFICINAS REGIONALES
+
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Oficinas_regionales"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Oficina", escriba texto}, {"regional", escriba texto}})
+en
+    #"Tipo cambiado"
+
+    // FILTRO PRODUCTOS COLPATRIA
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Base_Fuerza_Comercial"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Numero", Int64.Type}, {"Nombre Completo", escriba texto}, {"Cargo", escriba texto}, {"Fecha de Ingreso", escriba fecha y hora}, {"Oficina", escriba texto}, {"OFICINA HOMOLOGADA", escriba texto}, {"REGIONAL", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escriba texto}, {"Correo Electronico Corporativo", Int64.Type}, {"Estado", escriba texto}, {"Estado Colpatria", escriba texto}, {"Estado Av Villas", escriba texto}, {"Estado Bayport", escriba texto}, {"Estado CSC", tipo texto}, {"No Productos", Int64.Type}, {"Productos", tipo texto}}),
+    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado", each ([Estado] = "ACTIVO")),
+    Personalizado1 = #"Filas filtradas",
+    #"Filas ordenadas" = Table.Sort(Personalizado1,{{"No Productos", Order.Ascending}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas ordenadas",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "OFICINA HOMOLOGADA", "Estado", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "No Productos", "Productos"}),
+    #"Texto recortado" = Table.TransformColumns(#"Otras columnas quitadas",{{"Productos", Text.Trim, type text}}),
+    Personalizado2 = #"Texto recortado",
+    #"Filas filtradas1" = Table.SelectRows(Personalizado2, each [Fecha de Ingreso] > #datetime(2019, 11, 30, 0, 0, 0)),
+    #"Filas filtradas2" = Table.SelectRows(#"Filas filtradas1", each [Estado Colpatria] = null)
+en
+    #"Filas filtradas2"
+    //FILTRO PRODUCTOS ACTIVOS 
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Base_Fuerza_Comercial"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Numero", Int64.Type}, {"Nombre Completo", escriba texto}, {"Cargo", escriba texto}, {"Fecha de Ingreso", escriba fecha y hora}, {"Oficina", escriba texto}, {"OFICINA HOMOLOGADA", escriba texto}, {"REGIONAL", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Telefono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escriba texto}, {"Correo Electronico Corporativo", Int64.Type}, {"Estado", escriba texto}, {"Estado Colpatria", escriba texto}, {"Estado Av Villas", escriba texto}, {"Estado Bayport", escriba texto}, {"Estado CSC", tipo texto}, {"No Productos", Int64.Type}, {"Productos", tipo texto}}),
+    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado", each ([Estado] = "ACTIVO")),
+    Personalizado1 = #"Filas filtradas",
+    #"Filas ordenadas" = Table.Sort(Personalizado1,{{"No Productos", Order.Ascending}}),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas ordenadas",{"Numero", "Nombre Completo", "Cargo", "Fecha de Ingreso", "OFICINA HOMOLOGADA", "Estado", "Estado Colpatria", "Estado Av Villas", "Estado Bayport", "Estado CSC", "No Productos", "Productos"}),
+    #"Texto recortado" = Table.TransformColumns(#"Otras columnas quitadas",{{"Productos", Text.Trim, type text}}),
+    Personalizado2 = #"Texto recortado",
+    #"Filas filtradas1" = Table.SelectRows(Personalizado2, each [Fecha de Ingreso] > #datetime(2019, 11, 30, 0, 0, 0)),
+    #"Filas filtradas2" = Table.SelectRows(#"Filas filtradas1", each [Estado Colpatria] = null)
+en
+    #"Filas filtradas2"
+
+    //CONSOLIDADO COLFINACTIVA 
+    dejar
+    Origen = Table.Combine({#"COLFINACTIVA FREE", #"COLFINACTIVA PLANTA"})
+en
+    Origen
+
+    // CUMPLEAÑO
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Name="Consolidado_Bases"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"No de Carta", Int64.Type}, {"Tipo", type text}, {"ESPECIAL", Int64.Type}, {"Numero", Int64.Type}, {"Nombre Completo", type text}, {"Area", type text}, {"Subarea", type text}, {"Cargo", type text}, {"Genero", type texto}, {"Fecha de Ingreso", escriba fecha y hora}, {"Tipo de Contrato", escriba texto}, {"Dashboard", escriba texto}, {"DEPARTAMENTO", escriba texto}, {"Oficina", escriba texto}, {"OFICINA HOMOLOGADA", escriba texto}, {"REGIONAL", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Retiro", Int64.Type}, {"Modalidad del Retiro", escriba texto}, {"Motivo del Retiro", escriba texto}, {"Fecha de Nacimiento", escriba fecha y hora}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Telefono Fijo", escriba cualquiera}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electronico Personal", escriba cualquiera}, {"Correo Electronico Corporativo", escriba cualquiera}, {"EPS", escriba texto}, {"Afiliacion", escriba texto}, {"AFP", escriba texto}, {"CCF", escriba texto}, {"CES", escriba texto}, {"Estado", escriba texto}, {"NODO", escriba texto}, {"ESTADO FILTRO", escriba texto}, {"Estado Colpatria", escriba texto}, {"Estado Av Villas", escriba texto}, {"Estado Bayport", escriba texto}, {"Estado CSC", escriba text}, {"Estado GNB Sudameris", escriba texto}, {"Nombre Completo - Copia", escriba texto}, {"Recuento_Activo", Int64.Type}, {"Recuento_Retirado", Int64.Type}, {"CONTAR", Int64.Type}, {"ANALISIS DUPLICADOS_3", escriba texto}}),
+    #"Mes insertado" = Table.AddColumn(#"Tipo cambiado", "Mes", each Date.Month([Fecha de Nacimiento]), Int64.Type),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Mes insertado",{{"Mes", "Mes Cumpleaños"}}),
+    #"FILTRO Mes Cumpñeaños" = Table.SelectRows(#"Columnas con nombre cambiado", each [Mes Cumpleaños] = 4),
+    Personalizado1 = #"FILTRO Mes Cumpñeaños",
+    #"FILTRO ACTIVOS" = Table.SelectRows(Personalizado1, cada uno ([ANALISIS DUPLICADOS_3] = "1 ACTIVO 1" o [ANALISIS DUPLICADOS_3] = "1 ACTIVO_Pend Documentos 1" o [ANALISIS DUPLICADOS_3] = "2 ACTIVO 1")),
+    #"Día insertado" = Table.AddColumn(#"FILTRO ACTIVOS", "Día", each Date.Day([Fecha de Nacimiento]), Int64.Type),
+    #"Columnas con nombre cambiado1" = Table.RenameColumns(#"Día insertado",{{"Día", "Día Cumpleaños"}}),
+    #"Nombre del mes insertado" = Table.AddColumn(#"Columnas con nombre cambiado1", "Nombre del mes", cada Date.MonthName([Fecha de Nacimiento]), escriba texto),
+    #"Poner En Mayúsculas Cada Palabra" = Table.TransformColumns(#"Nombre del mes insertado",{{"Nombre del mes", Text.Proper, type text}}),
+    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Poner En Mayúsculas Cada Palabra",{{"Día Cumpleaños", type text}}),
+    #"Día insertado1" = Table.AddColumn(#"Tipo cambió1", "Día", each Date.Day([Fecha de Nacimiento]), Int64.Type),
+    #"Filas ordenadas" = Table.Sort(#"Día insertado1",{{"Día", Order.Ascending}}),
+    #"Personalizada agregada" = Table.AddColumn(#"Filas ordenadas", "Texto_Fecha Cumpleaños", each [Día Cumpleaños]&" "&"de"&" "&[Nombre del mes]),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Personalizada agregada",{"Nombre Completo", "Cargo", "OFICINA HOMOLOGADA", "Fecha de Nacimiento", "Celular Personal", "Celular Corporativo", "Correo Electronico Corporativo", "Nombre Completo - Copia", "Día Cumpleaños", "Día", "Texto_Fecha Cumpleaños", "Correo Electronico Personal"}),
+    #"Columnas reordenadas" = Table.ReorderColumns(#"Otras columnas quitadas",{"Nombre Completo", "Fecha de Nacimiento", "Correo Electronico Personal", "Correo Electronico Corporativo", "Celular Personal", "Celular Corporativo", "Nombre Completo - Copia", "Texto_Fecha Cumpleaños", "Cargo", "OFICINA HOMOLOGADA"})
+en
+    #"Columnas reordenadas"
+    // BASE QUÉ
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Base_Fuerza_Comercial"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Numero", Int64.Type}, {"ESPECIAL", Int64.Type}, {"Nombre Completo", escriba texto}, {"Cargo", escriba texto}, {"Genero", escriba texto}, {"Fecha de Ingreso", escriba fecha y hora}, {"OFICINA HOMOLOGADA", escriba texto}, {"REGIONAL", escriba texto}, {"Oficina", escriba texto}, {"Nombre Jefe Directo", escriba texto}, {"Cargo Jefe Directo", escriba texto}, {"Fecha de Nacimiento", escriba fecha y hora}, {"Edad", escriba texto}, {"Grupo Sanguineo", escriba texto}, {"Teléfono Fijo", Int64.Type}, {"Celular Personal", Int64.Type}, {"Celular Corporativo", Int64.Type}, {"Correo Electrónico Personal", escriba texto}, {"Correo Electronico Corporativo", Int64.Type}, {"EPS", escribe texto}, {"Afiliacion", escribe texto}, {"AFP", escribe texto}, {"Estado", escribe texto}, {"NODO", escribe texto}, {"Estado Colpatria", escribe texto}, {"Estado Av Villas", escribe texto}, {"Estado Bayport", escribe texto}, {"Estado CSC", escribe texto}, {"Estado GNB Sudameris", escriba texto}, {"Nombre Completo - Copia", escriba texto}, {"No Productos", Int64.Type}, {"Productos", escriba texto}, {"VALIDADOR", escriba cualquiera}, {"DEPURACION", escriba texto}}),
+    #"Filas filtradas" = Table.SelectRows(#"Tipo cambiado", each ([Cargo] <> "ASESOR NODO" and [Cargo] <> "DIRECTOR DE OFICINA")),
+    #"Filas filtradas1" = Table.SelectRows(#"Filas filtradas", each ([Estado] <> "RETIRADO")),
+    #"Otras columnas quitadas" = Table.SelectColumns(#"Filas filtradas1",{"Numero", "Nombre Completo", "Cargo", "OFICINA HOMOLOGADA", "Oficina", "Celular Personal", "Celular Corporativo", "Correo Electronico Personal", "Correo Electronico Corporativo", "Nombre Completo - Copia"}),
+    #"Prefijo agregado" = Table.TransformColumns(#"Otras columnas quitadas", {{"Nombre Completo - Copia", each "*" & _, type text}}),
+    #"Sufijo agregado" = Table.TransformColumns(#"Prefijo agregado", {{"Nombre Completo - Copia", each _ & "*", type text}}),
+    #"Consultas combinadas" = Table.NestedJoin(#"Sufijo agregado", {"OFICINA HOMOLOGADA"}, #"DIRECCIONES Y TELEF OFICINAS", {"CIUDAD"}, "DIRECCIONES Y TELEF OFICINAS", JoinKind.LeftOuter),
+    #"Se expandió DIRECCIONES Y TELEF OFICINAS" = Table.ExpandTableColumn(#"Consultas combinadas", "DIRECCIONES Y TELEF OFICINAS", {"CIUDAD", "DIRECCIÓN", "DIRECTOR", "CELULAR", "CRUCE", "EMAIL", "Poner En Mayúsculas Cada Palabra"}, {"DIRECCIONES Y TELEF OFICINAS.CIUDAD", "DIRECCIONES Y TELEF OFICINAS.DIRECCIÓN", "DIRECCIONES Y TELEF OFICINAS.DIRECTOR", "DIRECCIONES Y TELEF OFICINAS.CELULAR", "DIRECCIONES Y TELEF OFICINAS.CRUCE", "DIRECCIONES Y TELEF OFICINAS.EMAIL", "DIRECCIONES Y TELEF OFICINAS.Poner En Mayúsculas Cada Palabra"}),
+    #"Filas filtradas2" = Table.SelectRows(#"Se expandió DIRECCIONES Y TELEF OFICINAS", each ([DIRECCIONES Y TELEF OFICINAS.DIRECTOR] <> null))
+en
+    #"Filas filtradas2"
+
+    //DIRECCIONES Y TELEFONO OFICINAS
+    dejar
+    Origen = Excel.Workbook(File.Contents("Z:\Documentos\DIRECCIONES Y CELULARES.xlsx"), null, true),
+    Tabla1_2_Tabla = Origen{[Ítem="Tabla1_2",Tipo="Tabla"]}[Datos],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Tabla1_2_Table,{{"CIUDAD", escriba texto}, {"DIRECCIÓN", escriba texto}, {"DIRECTOR", escriba texto}, {"CELULAR", Int64.Type}, {"EMAIL", escriba texto}, {"Poner En Mayúsculas Cada Palabra", escriba texto}})
+en
+    #"Tipo cambiado"
+    // EXCLUSIONES_BANCO_POPULAR 
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="EXCLUSIONES_BANCO_POPULAR"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Documento", Int64.Type}, {"Observacion", escriba texto}})
+en
+    #"Tipo cambiado"
+    //ADICIONAL 
+    dejar
+    Origen = Excel.CurrentWorkbook(){[Nombre="Tabla7"]}[Contenido],
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Numero", Int64.Type}, {"Nombre Completo", escriba texto}, {"Cargo", escriba texto}, {"Oficina", escriba texto}})
+en
+    #"Tipo cambiado"
+    //ENTIDADES AUTORIZADAS_ //
